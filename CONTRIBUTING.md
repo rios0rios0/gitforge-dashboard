@@ -8,6 +8,7 @@ development practices, refer to the **[Development Guide](https://github.com/rio
 ## Prerequisites
 
 - Node.js 20+
+- [Corepack](https://nodejs.org/api/corepack.html) (ships with Node.js 16.13+)
 - [Make](https://www.gnu.org/software/make/)
 
 ## Development Workflow
@@ -16,7 +17,8 @@ development practices, refer to the **[Development Guide](https://github.com/rio
 2. Create a branch: `git checkout -b feat/my-change`
 3. Install dependencies:
    ```bash
-   npm install
+   corepack enable
+   yarn install
    ```
 4. Make your changes
 5. Validate:

@@ -9,9 +9,10 @@ A client-side-only TypeScript + React dashboard deployed on GitHub Pages. It dis
 ## Commands
 
 ```bash
-npm install            # Install dependencies
-npm run dev            # Start dev server with hot reload
-npm run build          # Type-check and build for production
+corepack enable        # Enable Yarn Berry via corepack (first time only)
+yarn install           # Install dependencies
+yarn dev               # Start dev server with hot reload
+yarn build             # Type-check and build for production
 make lint              # Run ESLint via pipeline scripts
 make test              # Run Vitest via pipeline scripts
 make sast              # Run full SAST suite (CodeQL, Semgrep, Trivy, Hadolint, Gitleaks)
@@ -55,8 +56,8 @@ src/main/             → DI wiring via factories, app entry point
 
 ```bash
 make test              # Full suite (ALWAYS use this)
-npm run test           # Quick check during development
-npm run test:watch     # Watch mode for TDD
+yarn test              # Quick check during development
+yarn test:watch        # Watch mode for TDD
 ```
 
 ## Deployment
