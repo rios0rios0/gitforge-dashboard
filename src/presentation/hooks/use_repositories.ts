@@ -7,7 +7,7 @@ export interface UseRepositoriesResult {
   isLoading: boolean;
   error: string | null;
   lastFetchedAt: Date | null;
-  refetch: () => void;
+  refetch: () => Promise<void>;
 }
 
 export const useRepositories = (

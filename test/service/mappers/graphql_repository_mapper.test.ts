@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mapGraphQLNodeToRepository } from "../../../src/service/mappers/graphql_repository_mapper";
-import type { GraphQLRepositoryNode } from "../../../src/infrastructure/repositories/github_graphql_repository_repository";
+import type { GraphQLRepositoryNode } from "../../../src/service/mappers/graphql_repository_node";
 
 const createNode = (overrides: Partial<GraphQLRepositoryNode> = {}): GraphQLRepositoryNode => ({
   id: "node-1",

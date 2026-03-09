@@ -1,5 +1,6 @@
 import type { Repository } from "../../domain/entities/repository";
 import type { RepositoryRepository } from "../../domain/repositories/repository_repository";
+import type { GraphQLRepositoryNode } from "../../service/mappers/graphql_repository_node";
 import { graphqlRequest } from "../http/graphql_client";
 import { mapGraphQLNodeToRepository } from "../../service/mappers/graphql_repository_mapper";
 
@@ -63,38 +64,6 @@ query DashboardData($username: String!, $cursor: String) {
 }
 `;
 
-interface GraphQLRepositoryNode {
-  id: string;
-  name: string;
-  nameWithOwner: string;
-  url: string;
-  description: string | null;
-  visibility: "PUBLIC" | "PRIVATE";
-  isArchived: boolean;
-  isFork: boolean;
-  updatedAt: string;
-  primaryLanguage: { name: string } | null;
-  defaultBranchRef: {
-    name: string;
-    target: {
-      oid: string;
-      messageHeadline: string;
-      commitUrl: string;
-      statusCheckRollup: { state: string } | null;
-    };
-  } | null;
-  latestRelease: {
-    tagName: string;
-    name: string;
-    publishedAt: string;
-    url: string;
-    isPrerelease: boolean;
-  } | null;
-  refs: {
-    nodes: { name: string; target: { oid: string } }[];
-  };
-}
-
 interface DashboardQueryResponse {
   user: {
     repositories: {
@@ -103,8 +72,6 @@ interface DashboardQueryResponse {
     };
   };
 }
-
-export type { GraphQLRepositoryNode };
 
 export class GitHubGraphQLRepositoryRepository implements RepositoryRepository {
   async listAll(token: string, username: string): Promise<Repository[]> {

@@ -18,6 +18,7 @@ export const FilterBar = ({ filter, languages, onFilterChange, onReset }: Filter
     <input
       type="text"
       placeholder="Search repositories..."
+      aria-label="Search repositories"
       value={filter.searchQuery}
       onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
       className="min-w-48 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
