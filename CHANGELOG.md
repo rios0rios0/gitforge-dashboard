@@ -17,7 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added auto-refresh with configurable polling interval
 - added CI pipeline with GitHub Actions and GitHub Pages deployment
 - added MIT `LICENSE` file
-- added `.github/pull_request_template.md` with quality checklist
+- added `CODE_OF_CONDUCT.md` (Contributor Covenant v2.0)
+- added PR template directory with default and bump templates
+- added branch protection rules, repository ruleset, and copilot environment on GitHub
 
 ### Changed
 
