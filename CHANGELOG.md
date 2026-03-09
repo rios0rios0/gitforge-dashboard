@@ -25,3 +25,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed missing `aria-label` on search input in filter bar for screen reader accessibility
 - fixed unnecessary `useMemo` wrapping a constant `null` in the app root component
 - fixed CI pipeline failure caused by missing `yarn.lock` and `@testing-library/dom` peer dependency
+- fixed CI `yarn npm audit` and `yarn test:ci` failures by switching to Yarn Berry with `packageManager` field and adding `@vitest/coverage-v8`
