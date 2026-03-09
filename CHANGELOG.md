@@ -16,3 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added dashboard with filterable, sortable repository grid
 - added auto-refresh with configurable polling interval
 - added CI pipeline with GitHub Actions and GitHub Pages deployment
+
+### Fixed
+
+- fixed `hasWorkflows` incorrectly returning `true` for repos without a default branch ref
+- fixed `refetch` type mismatch in `useRepositories` hook (was `void`, now `Promise<void>`)
+- fixed Clean Architecture layer violation where service mapper imported from infrastructure
+- fixed missing `aria-label` on search input in filter bar for screen reader accessibility
+- fixed unnecessary `useMemo` wrapping a constant `null` in the app root component
+- fixed CI pipeline failure caused by missing `@testing-library/dom` peer dependency and `@vitest/coverage-v8` for coverage
+- fixed CI pipeline to use Yarn Berry (v4.12.0) via corepack after upstream pipeline fix, replacing the Yarn 1 workaround

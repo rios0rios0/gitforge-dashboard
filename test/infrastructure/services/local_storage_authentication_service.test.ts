@@ -1,0 +1,83 @@
+import { beforeEach, describe, expect, it } from "vitest";
+import { LocalStorageAuthenticationService } from "../../../src/infrastructure/services/local_storage_authentication_service";
+
+class InMemoryStorage implements Storage {
+  private store = new Map<string, string>();
+
+  get length(): number {
+    return this.store.size;
+  }
+
+  clear(): void {
+    this.store.clear();
+  }
+
+  getItem(key: string): string | null {
+    return this.store.get(key) ?? null;
+  }
+
+  key(index: number): string | null {
+    return [...this.store.keys()][index] ?? null;
+  }
+
+  removeItem(key: string): void {
+    this.store.delete(key);
+  }
+
+  setItem(key: string, value: string): void {
+    this.store.set(key, value);
+  }
+}
+
+describe("LocalStorageAuthenticationService", () => {
+  let storage: InMemoryStorage;
+  let service: LocalStorageAuthenticationService;
+
+  beforeEach(() => {
+    storage = new InMemoryStorage();
+    service = new LocalStorageAuthenticationService(storage);
+  });
+
+  it("should return token when token was previously set", () => {
+    // given
+    service.setToken("ghp_test123");
+
+    // when
+    const result = service.getToken();
+
+    // then
+    expect(result).toBe("ghp_test123");
+  });
+
+  it("should return null when no token exists", () => {
+    // when
+    const result = service.getToken();
+
+    // then
+    expect(result).toBeNull();
+  });
+
+  it("should return username when username was previously set", () => {
+    // given
+    service.setUsername("testuser");
+
+    // when
+    const result = service.getUsername();
+
+    // then
+    expect(result).toBe("testuser");
+  });
+
+  it("should clear token and username when clearToken is called", () => {
+    // given
+    service.setToken("ghp_test123");
+    service.setUsername("testuser");
+
+    // when
+    service.clearToken();
+
+    // then
+    expect(service.getToken()).toBeNull();
+    expect(service.getUsername()).toBeNull();
+  });
+});
