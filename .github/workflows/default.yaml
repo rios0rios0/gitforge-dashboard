@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   ci:
-    uses: 'rios0rios0/pipelines/.github/workflows/javascript.yaml@fix/yarn-berry-corepack-order'
+    uses: 'rios0rios0/pipelines/.github/workflows/javascript.yaml@main'
 
   deploy:
     runs-on: 'ubuntu-latest'
