@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added dashboard with filterable, sortable repository grid
 - added auto-refresh with configurable polling interval
 - added CI pipeline with GitHub Actions and GitHub Pages deployment
+- added MIT `LICENSE` file
+- added `.github/pull_request_template.md` with quality checklist
+
+### Changed
+
+- changed `README.md` to be illustrative with feature table, architecture tree, security section, and development guide
+- changed CI pipeline reference from feature branch back to `@main` after upstream pipeline fix was merged
 
 ### Fixed
 
