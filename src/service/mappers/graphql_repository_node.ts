@@ -28,4 +28,7 @@ export interface GraphQLRepositoryNode {
   refs: {
     nodes: { name: string; target: { oid: string } }[];
   };
+  branchRefs: {
+    nodes: { name: string }[];
+  };
 }

@@ -44,6 +44,21 @@ const fetchLatestBuild = async (
   }
 };
 
+const fetchBranches = async (
+  token: string,
+  org: string,
+  project: string,
+  repoId: string,
+): Promise<string[]> => {
+  try {
+    const url = `${ADO_API}/${org}/${project}/_apis/git/repositories/${repoId}/refs?filter=heads/&${API_VERSION}`;
+    const response = await adoRequest<AdoListResponse<AdoRefNode>>(token, url);
+    return response.value.map((ref) => ref.name.replace("refs/heads/", ""));
+  } catch {
+    return [];
+  }
+};
+
 const fetchLatestTag = async (
   token: string,
   org: string,
@@ -89,11 +104,12 @@ export class AdoRestRepositoryRepository implements RepositoryRepository {
 
     return processBatch(allRepos, BATCH_SIZE, async (repo) => {
       const projectName = repo.project.name;
-      const [build, tagRef] = await Promise.all([
+      const [build, tagRef, branches] = await Promise.all([
         fetchLatestBuild(token, organization, projectName, repo.id),
         fetchLatestTag(token, organization, projectName, repo.id),
+        fetchBranches(token, organization, projectName, repo.id),
       ]);
-      return mapAdoRepoToRepository(repo, build, tagRef, organization);
+      return mapAdoRepoToRepository(repo, build, tagRef, organization, branches);
     });
   }
 }

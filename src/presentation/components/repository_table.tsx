@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -30,6 +30,44 @@ const formatRelativeDate = (dateString: string): string => {
   if (diffDays < 30) return `${diffDays}d ago`;
   if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
   return `${Math.floor(diffDays / 365)}y ago`;
+};
+
+const BranchesCell = ({ branches, defaultBranch }: { branches: string[]; defaultBranch: string }) => {
+  const [open, setOpen] = useState(false);
+  const nonDefault = branches.filter((b) => b !== defaultBranch);
+  const count = nonDefault.length;
+
+  const toggle = useCallback(() => setOpen((prev) => !prev), []);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={toggle}
+        className="rounded border border-gray-300 px-2 py-0.5 text-xs tabular-nums hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+      >
+        {count}
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={toggle} />
+          <div className="absolute left-0 top-full z-20 mt-1 max-h-60 w-56 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">
+            {nonDefault.length === 0 ? (
+              <p className="px-3 py-2 text-xs text-gray-400 dark:text-gray-500">No extra branches</p>
+            ) : (
+              <ul className="py-1">
+                {nonDefault.map((branch) => (
+                  <li key={branch} className="px-3 py-1 text-xs text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700">
+                    {branch}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
 };
 
 const columns: ColumnDef<Repository>[] = [
@@ -69,6 +107,32 @@ const columns: ColumnDef<Repository>[] = [
       );
     },
     filterFn: "includesString",
+  },
+  {
+    accessorKey: "defaultBranch",
+    header: "Default Branch",
+    cell: ({ getValue }) => {
+      const branch = getValue<string>();
+      const isNonStandard = branch !== "main";
+      return (
+        <span className={`text-xs font-mono ${isNonStandard ? "rounded bg-amber-100 px-1.5 py-0.5 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" : "text-gray-700 dark:text-gray-300"}`}>
+          {branch}
+          {isNonStandard && (
+            <span className="ml-1 not-italic" title="Default branch is not 'main'">{"\u26A0"}</span>
+          )}
+        </span>
+      );
+    },
+    filterFn: "includesString",
+  },
+  {
+    id: "branches",
+    accessorFn: (row) => row.branches.filter((b) => b !== row.defaultBranch).length,
+    header: "Branches",
+    cell: ({ row }) => (
+      <BranchesCell branches={row.original.branches} defaultBranch={row.original.defaultBranch} />
+    ),
+    enableColumnFilter: false,
   },
   {
     id: "ciStatus",
@@ -201,7 +265,7 @@ const LoadingSkeleton = () => (
   <tbody>
     {Array.from({ length: 8 }, (_, i) => (
       <tr key={i} className="animate-pulse">
-        {Array.from({ length: 7 }, (_, j) => (
+        {Array.from({ length: 9 }, (_, j) => (
           <td key={j} className="px-3 py-3">
             <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-700" />
           </td>

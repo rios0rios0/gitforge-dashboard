@@ -26,6 +26,7 @@ export class RepositoryBuilder {
       latestRelease: null,
       latestTag: null,
       hasWorkflows: false,
+      branches: ["main"],
     };
   }
 

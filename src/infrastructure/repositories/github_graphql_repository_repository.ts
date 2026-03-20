@@ -58,6 +58,11 @@ query DashboardData($username: String!, $cursor: String) {
             }
           }
         }
+        branchRefs: refs(refPrefix: "refs/heads/", first: 100) {
+          nodes {
+            name
+          }
+        }
       }
     }
   }

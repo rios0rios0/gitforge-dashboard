@@ -18,4 +18,5 @@ export interface Repository {
   readonly latestRelease: Release | null;
   readonly latestTag: Tag | null;
   readonly hasWorkflows: boolean;
+  readonly branches: string[];
 }

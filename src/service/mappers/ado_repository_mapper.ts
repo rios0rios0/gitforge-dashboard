@@ -40,6 +40,7 @@ export const mapAdoRepoToRepository = (
   build: AdoBuildNode | null,
   tagRef: AdoRefNode | null,
   org: string,
+  branches: string[] = [],
 ): Repository => {
   const ciStatus = mapCIStatus(build);
 
@@ -59,5 +60,6 @@ export const mapAdoRepoToRepository = (
     latestRelease: null,
     latestTag: mapTag(tagRef),
     hasWorkflows: build !== null,
+    branches,
   };
 };

@@ -61,4 +61,5 @@ export const mapGraphQLNodeToRepository = (node: GraphQLRepositoryNode): Reposit
   latestRelease: mapRelease(node),
   latestTag: mapTag(node),
   hasWorkflows: node.defaultBranchRef?.target.statusCheckRollup != null,
+  branches: node.branchRefs.nodes.map((ref) => ref.name),
 });

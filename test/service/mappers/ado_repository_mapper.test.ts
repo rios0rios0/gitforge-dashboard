@@ -43,7 +43,7 @@ describe("mapAdoRepoToRepository", () => {
     const tag = createTag();
 
     // when
-    const result = mapAdoRepoToRepository(repo, build, tag, "org");
+    const result = mapAdoRepoToRepository(repo, build, tag, "org", ["main", "develop", "feat/x"]);
 
     // then
     expect(result.name).toBe("my-repo");
@@ -57,6 +57,7 @@ describe("mapAdoRepoToRepository", () => {
     expect(result.latestTag?.commitSha).toBe("commit-sha-1");
     expect(result.latestRelease).toBeNull();
     expect(result.primaryLanguage).toBeNull();
+    expect(result.branches).toEqual(["main", "develop", "feat/x"]);
   });
 
   it("should map build result 'failed' to FAILURE", () => {
