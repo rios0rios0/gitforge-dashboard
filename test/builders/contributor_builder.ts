@@ -1,5 +1,5 @@
 import type { Contributor } from "../../src/domain/entities/contributor";
-import type { SonarCloudMetrics } from "../../src/domain/entities/sonar_cloud_metrics";
+import type { SonarMetrics } from "../../src/domain/entities/sonar_metrics";
 
 let counter = 0;
 
@@ -22,7 +22,7 @@ export class ContributorBuilder {
       pipelineSuccessRate: 90,
       totalPipelineRuns: 10,
       successfulPipelineRuns: 9,
-      sonarCloudMetrics: null,
+      sonarMetrics: null,
     };
   }
 
@@ -60,8 +60,8 @@ export class ContributorBuilder {
     return this;
   }
 
-  withSonarCloudMetrics(metrics: SonarCloudMetrics): this {
-    this.props = { ...this.props, sonarCloudMetrics: metrics };
+  withSonarMetrics(metrics: SonarMetrics): this {
+    this.props = { ...this.props, sonarMetrics: metrics };
     return this;
   }
 

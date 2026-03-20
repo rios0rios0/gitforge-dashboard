@@ -61,5 +61,6 @@ export const mapAdoRepoToRepository = (
     latestTag: mapTag(tagRef),
     hasWorkflows: build !== null,
     branches,
+    sonarMetrics: null,
   };
 };

@@ -9,32 +9,42 @@ import { LoginPage } from "../presentation/pages/login_page";
 import {
   createContributorRepository,
   createRepositoryRepository,
-  createSonarCloudRepository,
+  createSonarRepository,
 } from "./factories/repository_factory";
 import {
   createAuthenticationService,
   createContributorService,
   createDashboardService,
 } from "./factories/service_factory";
+import type { SonarConfig } from "../infrastructure/repositories/sonar_repository_impl";
 
 const authService = createAuthenticationService();
 
 export const App = () => {
-  const { token, username, sonarToken, platform, isAuthenticated, login, logout } =
+  const { token, username, sonarToken, sonarType, sonarUrl, platform, isAuthenticated, login, logout } =
     useAuthentication(authService);
+
+  const sonarConfig = useMemo((): SonarConfig | undefined => {
+    if (!sonarToken || !sonarType) return undefined;
+    if (sonarType === "cloud") {
+      return { type: "cloud", token: sonarToken, baseUrl: "https://sonarcloud.io", organization: username ?? undefined };
+    }
+    return { type: "qube", token: sonarToken, baseUrl: sonarUrl ?? "" };
+  }, [sonarToken, sonarType, sonarUrl, username]);
+
+  const sonarRepo = useMemo(() => createSonarRepository(sonarConfig), [sonarConfig]);
 
   const dashboardService = useMemo(() => {
     if (!platform) return null;
     const repoRepo = createRepositoryRepository(platform);
-    return createDashboardService(repoRepo);
-  }, [platform]);
+    return createDashboardService(repoRepo, sonarRepo);
+  }, [platform, sonarRepo]);
 
   const contributorService = useMemo(() => {
     if (!platform) return null;
     const contribRepo = createContributorRepository(platform);
-    const sonarRepo = createSonarCloudRepository(sonarToken ?? undefined);
     return createContributorService(contribRepo, sonarRepo);
-  }, [platform, sonarToken]);
+  }, [platform, sonarRepo]);
 
   const [activePage, setActivePage] = useState<ActivePage>("dashboard");
   const [lastFetchedAt, setLastFetchedAt] = useState<Date | null>(null);

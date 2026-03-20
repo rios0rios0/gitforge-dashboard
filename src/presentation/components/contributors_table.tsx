@@ -98,7 +98,7 @@ const columns: ColumnDef<Contributor>[] = [
   },
   {
     id: "bugs",
-    accessorFn: (row) => row.sonarCloudMetrics?.bugs ?? null,
+    accessorFn: (row) => row.sonarMetrics?.bugs ?? null,
     header: "Bugs",
     cell: ({ getValue }) => (
       <span className="text-sm text-gray-700 dark:text-gray-300">{getValue<number | null>() ?? "-"}</span>
@@ -107,7 +107,7 @@ const columns: ColumnDef<Contributor>[] = [
   },
   {
     id: "codeSmells",
-    accessorFn: (row) => row.sonarCloudMetrics?.codeSmells ?? null,
+    accessorFn: (row) => row.sonarMetrics?.codeSmells ?? null,
     header: "Smells",
     cell: ({ getValue }) => (
       <span className="text-sm text-gray-700 dark:text-gray-300">{getValue<number | null>() ?? "-"}</span>
@@ -116,7 +116,7 @@ const columns: ColumnDef<Contributor>[] = [
   },
   {
     id: "securityHotspots",
-    accessorFn: (row) => row.sonarCloudMetrics?.securityHotspots ?? null,
+    accessorFn: (row) => row.sonarMetrics?.securityHotspots ?? null,
     header: "Hotspots",
     cell: ({ getValue }) => (
       <span className="text-sm text-gray-700 dark:text-gray-300">{getValue<number | null>() ?? "-"}</span>
@@ -125,7 +125,7 @@ const columns: ColumnDef<Contributor>[] = [
   },
   {
     id: "vulnerabilities",
-    accessorFn: (row) => row.sonarCloudMetrics?.vulnerabilities ?? null,
+    accessorFn: (row) => row.sonarMetrics?.vulnerabilities ?? null,
     header: "Vulns",
     cell: ({ getValue }) => (
       <span className="text-sm text-gray-700 dark:text-gray-300">{getValue<number | null>() ?? "-"}</span>
@@ -134,7 +134,7 @@ const columns: ColumnDef<Contributor>[] = [
   },
   {
     id: "coverage",
-    accessorFn: (row) => row.sonarCloudMetrics?.coverage ?? null,
+    accessorFn: (row) => row.sonarMetrics?.coverage ?? null,
     header: "Coverage",
     cell: ({ getValue }) => {
       const v = getValue<number | null>();
@@ -144,7 +144,7 @@ const columns: ColumnDef<Contributor>[] = [
   },
   {
     id: "duplications",
-    accessorFn: (row) => row.sonarCloudMetrics?.duplications ?? null,
+    accessorFn: (row) => row.sonarMetrics?.duplications ?? null,
     header: "Dups",
     cell: ({ getValue }) => {
       const v = getValue<number | null>();
@@ -154,7 +154,7 @@ const columns: ColumnDef<Contributor>[] = [
   },
   {
     id: "technicalDebt",
-    accessorFn: (row) => row.sonarCloudMetrics?.technicalDebt ?? null,
+    accessorFn: (row) => row.sonarMetrics?.technicalDebt ?? null,
     header: "Debt",
     cell: ({ getValue }) => (
       <span className="text-sm text-gray-700 dark:text-gray-300">{getValue<string | null>() ?? "-"}</span>

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import type { Platform } from "../../domain/entities/platform";
+import type { SonarLoginInfo, SonarType } from "../hooks/use_authentication";
 
 interface AuthGateProps {
-  onLogin: (token: string, username: string, sonarToken: string | null, platform: Platform) => void;
+  onLogin: (token: string, username: string, sonar: SonarLoginInfo | null, platform: Platform) => void;
   error: string | null;
 }
 
@@ -11,17 +12,37 @@ const PLATFORM_OPTIONS: { value: Platform; label: string }[] = [
   { value: "azure-devops", label: "Azure DevOps" },
 ];
 
+const SONAR_OPTIONS: { value: SonarType | "none"; label: string }[] = [
+  { value: "none", label: "None" },
+  { value: "cloud", label: "SonarCloud" },
+  { value: "qube", label: "SonarQube" },
+];
+
+const inputClass =
+  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100";
+
 export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
   const [platform, setPlatform] = useState<Platform>("github");
   const [token, setToken] = useState("");
   const [username, setUsername] = useState("");
+  const [sonarType, setSonarType] = useState<SonarType | "none">("none");
   const [sonarToken, setSonarToken] = useState("");
+  const [sonarUrl, setSonarUrl] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (token.trim() && username.trim()) {
-      onLogin(token.trim(), username.trim(), sonarToken.trim() || null, platform);
-    }
+    if (!token.trim() || !username.trim()) return;
+
+    const sonar: SonarLoginInfo | null =
+      sonarType !== "none" && sonarToken.trim()
+        ? {
+            type: sonarType,
+            token: sonarToken.trim(),
+            url: sonarType === "qube" ? sonarUrl.trim() || undefined : undefined,
+          }
+        : null;
+
+    onLogin(token.trim(), username.trim(), sonar, platform);
   };
 
   const isGitHub = platform === "github";
@@ -62,7 +83,7 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder={isGitHub ? "your-username" : "your-organization"}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              className={inputClass}
               required
             />
           </div>
@@ -77,31 +98,69 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder={isGitHub ? "ghp_... or github_pat_..." : "your ADO PAT"}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              className={inputClass}
               required
             />
           </div>
 
           <div>
-            <label htmlFor="sonarToken" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              SonarCloud Token{" "}
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Code Quality Integration{" "}
               <span className="font-normal text-gray-400">(optional)</span>
             </label>
-            <input
-              id="sonarToken"
-              type="password"
-              value={sonarToken}
-              onChange={(e) => setSonarToken(e.target.value)}
-              placeholder="skip or paste your SonarCloud token"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-            />
-            <p className="mt-1 text-xs text-gray-400">
-              Leave blank to skip. SonarCloud columns will show &ldquo;-&rdquo;.
-            </p>
+            <div className="flex rounded-md border border-gray-200 bg-gray-50 p-1 dark:border-gray-600 dark:bg-gray-700">
+              {SONAR_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setSonarType(opt.value)}
+                  className={`flex-1 rounded px-2 py-1 text-xs font-medium transition-colors ${
+                    sonarType === opt.value
+                      ? "bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-gray-100"
+                      : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
 
+          {sonarType !== "none" && (
+            <>
+              {sonarType === "qube" && (
+                <div>
+                  <label htmlFor="sonarUrl" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    SonarQube Instance URL
+                  </label>
+                  <input
+                    id="sonarUrl"
+                    type="url"
+                    value={sonarUrl}
+                    onChange={(e) => setSonarUrl(e.target.value)}
+                    placeholder="https://sonarqube.example.com"
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              <div>
+                <label htmlFor="sonarToken" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {sonarType === "cloud" ? "SonarCloud Token" : "SonarQube Token"}
+                </label>
+                <input
+                  id="sonarToken"
+                  type="password"
+                  value={sonarToken}
+                  onChange={(e) => setSonarToken(e.target.value)}
+                  placeholder="your Sonar token"
+                  className={inputClass}
+                />
+              </div>
+            </>
+          )}
+
           {error && (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
+            <div className="rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-400">{error}</div>
           )}
 
           <button
@@ -113,25 +172,6 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
         </form>
 
         <div className="mt-6 rounded-md bg-gray-50 p-3 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-          {isGitHub ? (
-            <>
-              <p className="font-medium">Recommended: Fine-grained PAT</p>
-              <ul className="mt-1 list-inside list-disc space-y-0.5">
-                <li>Resource owner: your account</li>
-                <li>Repository access: All repositories</li>
-                <li>Permissions: Metadata (read-only)</li>
-              </ul>
-            </>
-          ) : (
-            <>
-              <p className="font-medium">Azure DevOps PAT Scopes</p>
-              <ul className="mt-1 list-inside list-disc space-y-0.5">
-                <li>Code: Read</li>
-                <li>Build: Read</li>
-                <li>Project and Team: Read</li>
-              </ul>
-            </>
-          )}
           <p className="mt-1">
             Your tokens are stored locally and never sent to any server except their respective APIs.
           </p>

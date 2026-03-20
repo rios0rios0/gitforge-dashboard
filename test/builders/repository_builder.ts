@@ -27,6 +27,7 @@ export class RepositoryBuilder {
       latestTag: null,
       hasWorkflows: false,
       branches: ["main"],
+      sonarMetrics: null,
     };
   }
 

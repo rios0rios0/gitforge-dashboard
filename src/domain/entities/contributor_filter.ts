@@ -48,22 +48,22 @@ export const filterContributors = (
 };
 
 const getSonarNumericValue = (contributor: Contributor, field: ContributorSortField): number => {
-  if (!contributor.sonarCloudMetrics) return 0;
+  if (!contributor.sonarMetrics) return 0;
   switch (field) {
     case "bugs":
-      return contributor.sonarCloudMetrics.bugs;
+      return contributor.sonarMetrics.bugs;
     case "codeSmells":
-      return contributor.sonarCloudMetrics.codeSmells;
+      return contributor.sonarMetrics.codeSmells;
     case "securityHotspots":
-      return contributor.sonarCloudMetrics.securityHotspots;
+      return contributor.sonarMetrics.securityHotspots;
     case "vulnerabilities":
-      return contributor.sonarCloudMetrics.vulnerabilities;
+      return contributor.sonarMetrics.vulnerabilities;
     case "coverage":
-      return contributor.sonarCloudMetrics.coverage;
+      return contributor.sonarMetrics.coverage;
     case "duplications":
-      return contributor.sonarCloudMetrics.duplications;
+      return contributor.sonarMetrics.duplications;
     case "technicalDebt":
-      return parseTechnicalDebt(contributor.sonarCloudMetrics.technicalDebt);
+      return parseTechnicalDebt(contributor.sonarMetrics.technicalDebt);
     default:
       return 0;
   }

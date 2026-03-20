@@ -1,4 +1,6 @@
-export interface SonarCloudMetrics {
+export type QualityGateStatus = "OK" | "ERROR" | "NONE";
+
+export interface SonarMetrics {
   readonly bugs: number;
   readonly codeSmells: number;
   readonly securityHotspots: number;
@@ -6,9 +8,10 @@ export interface SonarCloudMetrics {
   readonly coverage: number;
   readonly duplications: number;
   readonly technicalDebt: string;
+  readonly qualityGateStatus: QualityGateStatus;
 }
 
-export const EMPTY_SONAR_METRICS: SonarCloudMetrics = {
+export const EMPTY_SONAR_METRICS: SonarMetrics = {
   bugs: 0,
   codeSmells: 0,
   securityHotspots: 0,
@@ -16,4 +19,5 @@ export const EMPTY_SONAR_METRICS: SonarCloudMetrics = {
   coverage: 0,
   duplications: 0,
   technicalDebt: "0min",
+  qualityGateStatus: "NONE",
 };

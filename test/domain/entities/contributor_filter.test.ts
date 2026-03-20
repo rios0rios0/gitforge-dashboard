@@ -129,12 +129,12 @@ describe("sortContributors", () => {
     expect(result.map((c) => c.username)).toEqual(["stable", "unstable"]);
   });
 
-  it("should sort by SonarCloud bugs with null metrics treated as zero", () => {
+  it("should sort by Sonar bugs with null metrics treated as zero", () => {
     // given
     const contributors = [
       ContributorBuilder.create()
         .withUsername("buggy")
-        .withSonarCloudMetrics({
+        .withSonarMetrics({
           bugs: 10,
           codeSmells: 0,
           securityHotspots: 0,
@@ -142,6 +142,7 @@ describe("sortContributors", () => {
           coverage: 0,
           duplications: 0,
           technicalDebt: "0min",
+          qualityGateStatus: "NONE",
         })
         .build(),
       ContributorBuilder.create().withUsername("clean").build(),

@@ -230,6 +230,80 @@ const columns: ColumnDef<Repository>[] = [
       return row.original.visibility === filterValue;
     },
   },
+  {
+    id: "qualityGate",
+    accessorFn: (row) => row.sonarMetrics?.qualityGateStatus ?? "NONE",
+    header: "Quality Gate",
+    cell: ({ row }) => {
+      const status = row.original.sonarMetrics?.qualityGateStatus;
+      if (!status || status === "NONE") return <span className="text-xs text-gray-400 dark:text-gray-500">-</span>;
+      return status === "OK" ? (
+        <span className="rounded bg-green-100 px-1.5 py-0.5 text-xs text-green-800 dark:bg-green-900/30 dark:text-green-400">Passed</span>
+      ) : (
+        <span className="rounded bg-red-100 px-1.5 py-0.5 text-xs text-red-800 dark:bg-red-900/30 dark:text-red-400">Failed</span>
+      );
+    },
+    meta: { filterType: "select", options: ["", "OK", "ERROR"] },
+    filterFn: (row, _columnId, filterValue) => {
+      if (!filterValue) return true;
+      return (row.original.sonarMetrics?.qualityGateStatus ?? "NONE") === filterValue;
+    },
+  },
+  {
+    id: "sonarBugs",
+    accessorFn: (row) => row.sonarMetrics?.bugs ?? null,
+    header: "Bugs",
+    cell: ({ getValue }) => <span className="text-sm text-gray-700 dark:text-gray-300">{getValue<number | null>() ?? "-"}</span>,
+    enableColumnFilter: false,
+  },
+  {
+    id: "sonarSmells",
+    accessorFn: (row) => row.sonarMetrics?.codeSmells ?? null,
+    header: "Smells",
+    cell: ({ getValue }) => <span className="text-sm text-gray-700 dark:text-gray-300">{getValue<number | null>() ?? "-"}</span>,
+    enableColumnFilter: false,
+  },
+  {
+    id: "sonarVulns",
+    accessorFn: (row) => row.sonarMetrics?.vulnerabilities ?? null,
+    header: "Vulns",
+    cell: ({ getValue }) => <span className="text-sm text-gray-700 dark:text-gray-300">{getValue<number | null>() ?? "-"}</span>,
+    enableColumnFilter: false,
+  },
+  {
+    id: "sonarHotspots",
+    accessorFn: (row) => row.sonarMetrics?.securityHotspots ?? null,
+    header: "Hotspots",
+    cell: ({ getValue }) => <span className="text-sm text-gray-700 dark:text-gray-300">{getValue<number | null>() ?? "-"}</span>,
+    enableColumnFilter: false,
+  },
+  {
+    id: "sonarCoverage",
+    accessorFn: (row) => row.sonarMetrics?.coverage ?? null,
+    header: "Coverage",
+    cell: ({ getValue }) => {
+      const v = getValue<number | null>();
+      return <span className="text-sm text-gray-700 dark:text-gray-300">{v !== null ? `${v.toFixed(1)}%` : "-"}</span>;
+    },
+    enableColumnFilter: false,
+  },
+  {
+    id: "sonarDups",
+    accessorFn: (row) => row.sonarMetrics?.duplications ?? null,
+    header: "Dups",
+    cell: ({ getValue }) => {
+      const v = getValue<number | null>();
+      return <span className="text-sm text-gray-700 dark:text-gray-300">{v !== null ? `${v.toFixed(1)}%` : "-"}</span>;
+    },
+    enableColumnFilter: false,
+  },
+  {
+    id: "sonarDebt",
+    accessorFn: (row) => row.sonarMetrics?.technicalDebt ?? null,
+    header: "Debt",
+    cell: ({ getValue }) => <span className="text-sm text-gray-700 dark:text-gray-300">{getValue<string | null>() ?? "-"}</span>,
+    enableColumnFilter: false,
+  },
 ];
 
 const ColumnFilter = ({ column }: { column: { getFilterValue: () => unknown; setFilterValue: (v: unknown) => void; columnDef: ColumnDef<Repository> } }) => {
@@ -265,7 +339,7 @@ const LoadingSkeleton = () => (
   <tbody>
     {Array.from({ length: 8 }, (_, i) => (
       <tr key={i} className="animate-pulse">
-        {Array.from({ length: 9 }, (_, j) => (
+        {Array.from({ length: 17 }, (_, j) => (
           <td key={j} className="px-3 py-3">
             <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-700" />
           </td>

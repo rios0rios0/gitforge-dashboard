@@ -1,4 +1,5 @@
 import type { Release } from "./release";
+import type { SonarMetrics } from "./sonar_metrics";
 import type { Tag } from "./tag";
 import type { WorkflowStatus } from "./workflow_status";
 
@@ -19,4 +20,5 @@ export interface Repository {
   readonly latestTag: Tag | null;
   readonly hasWorkflows: boolean;
   readonly branches: string[];
+  readonly sonarMetrics: SonarMetrics | null;
 }
