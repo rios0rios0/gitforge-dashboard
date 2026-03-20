@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- added contributors metrics dashboard with SonarCloud integration and proportional metric distribution
+- added service-layer tests for `GitHubContributorService` covering aggregation, distribution, and error scenarios
+
+### Changed
+
+- changed approved PR counting to use only APPROVED review state instead of merged state fallback
+- changed sortable table headers to use `<button>` with `aria-sort` for keyboard and screen-reader accessibility
+
+### Fixed
+
+- fixed `lastFetchedAt` and `isLoading` state in App to properly reflect navigation refresh status
+- fixed `onRefetchRef` side effect during render phase by moving it to `useEffect`
+- fixed `LoadingSkeleton` column count mismatch (13 vs 12 table headers)
+- fixed `SonarCloudRepositoryImpl` and `NoOpSonarCloudRepository` method signatures to match interface contract
+- fixed TypeScript circular type inference in contributor repository GraphQL pagination loop
+
 ## [0.1.0] - 2026-03-12
 
 ### Added

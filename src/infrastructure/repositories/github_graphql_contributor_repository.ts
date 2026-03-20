@@ -77,7 +77,7 @@ export class GitHubGraphQLContributorRepository implements ContributorRepository
     const searchQuery = `type:pr user:${username} ${dateFilter}`.trim();
 
     for (;;) {
-      const response = await graphqlRequest<SearchQueryResponse>(token, CONTRIBUTOR_QUERY, {
+      const response: SearchQueryResponse = await graphqlRequest<SearchQueryResponse>(token, CONTRIBUTOR_QUERY, {
         searchQuery,
         cursor,
       });
