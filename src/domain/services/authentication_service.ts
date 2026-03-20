@@ -6,4 +6,6 @@ export interface AuthenticationService {
   setUsername(username: string): void;
   getSonarToken(): string | null;
   setSonarToken(token: string): void;
+  getPlatform(): string | null;
+  setPlatform(platform: string): void;
 }

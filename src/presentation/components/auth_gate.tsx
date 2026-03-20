@@ -1,11 +1,18 @@
 import { useState } from "react";
+import type { Platform } from "../../domain/entities/platform";
 
 interface AuthGateProps {
-  onLogin: (token: string, username: string, sonarToken: string | null) => void;
+  onLogin: (token: string, username: string, sonarToken: string | null, platform: Platform) => void;
   error: string | null;
 }
 
+const PLATFORM_OPTIONS: { value: Platform; label: string }[] = [
+  { value: "github", label: "GitHub" },
+  { value: "azure-devops", label: "Azure DevOps" },
+];
+
 export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
+  const [platform, setPlatform] = useState<Platform>("github");
   const [token, setToken] = useState("");
   const [username, setUsername] = useState("");
   const [sonarToken, setSonarToken] = useState("");
@@ -13,29 +20,48 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (token.trim() && username.trim()) {
-      onLogin(token.trim(), username.trim(), sonarToken.trim() || null);
+      onLogin(token.trim(), username.trim(), sonarToken.trim() || null, platform);
     }
   };
+
+  const isGitHub = platform === "github";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
         <h1 className="mb-2 text-2xl font-bold text-gray-900">GitForge Dashboard</h1>
         <p className="mb-6 text-sm text-gray-500">
-          Connect with a GitHub Personal Access Token to view your repositories.
+          Connect to your repositories and view CI status, releases, and contributor metrics.
         </p>
+
+        <div className="mb-6 flex rounded-md border border-gray-200 bg-gray-50 p-1">
+          {PLATFORM_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setPlatform(opt.value)}
+              className={`flex-1 rounded px-3 py-1.5 text-sm font-medium transition-colors ${
+                platform === opt.value
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="username" className="mb-1 block text-sm font-medium text-gray-700">
-              GitHub Username
+              {isGitHub ? "GitHub Username" : "Organization Name"}
             </label>
             <input
               id="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="your-username"
+              placeholder={isGitHub ? "your-username" : "your-organization"}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
               required
             />
@@ -50,7 +76,7 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
               type="password"
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              placeholder="ghp_... or github_pat_..."
+              placeholder={isGitHub ? "ghp_... or github_pat_..." : "your ADO PAT"}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
               required
             />
@@ -87,13 +113,28 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
         </form>
 
         <div className="mt-6 rounded-md bg-gray-50 p-3 text-xs text-gray-500">
-          <p className="font-medium">Recommended: Fine-grained PAT</p>
-          <ul className="mt-1 list-inside list-disc space-y-0.5">
-            <li>Resource owner: your account</li>
-            <li>Repository access: All repositories</li>
-            <li>Permissions: Metadata (read-only)</li>
-          </ul>
-          <p className="mt-1">Your tokens are stored locally and never sent to any server except their respective APIs.</p>
+          {isGitHub ? (
+            <>
+              <p className="font-medium">Recommended: Fine-grained PAT</p>
+              <ul className="mt-1 list-inside list-disc space-y-0.5">
+                <li>Resource owner: your account</li>
+                <li>Repository access: All repositories</li>
+                <li>Permissions: Metadata (read-only)</li>
+              </ul>
+            </>
+          ) : (
+            <>
+              <p className="font-medium">Azure DevOps PAT Scopes</p>
+              <ul className="mt-1 list-inside list-disc space-y-0.5">
+                <li>Code: Read</li>
+                <li>Build: Read</li>
+                <li>Project and Team: Read</li>
+              </ul>
+            </>
+          )}
+          <p className="mt-1">
+            Your tokens are stored locally and never sent to any server except their respective APIs.
+          </p>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import type { AuthenticationService } from "../../domain/services/authentication
 const TOKEN_KEY = "gitforge-dashboard:token";
 const USERNAME_KEY = "gitforge-dashboard:username";
 const SONAR_TOKEN_KEY = "gitforge-dashboard:sonar-token";
+const PLATFORM_KEY = "gitforge-dashboard:platform";
 
 export class LocalStorageAuthenticationService implements AuthenticationService {
   private readonly storage: Storage;
@@ -23,6 +24,7 @@ export class LocalStorageAuthenticationService implements AuthenticationService 
     this.storage.removeItem(TOKEN_KEY);
     this.storage.removeItem(USERNAME_KEY);
     this.storage.removeItem(SONAR_TOKEN_KEY);
+    this.storage.removeItem(PLATFORM_KEY);
   }
 
   getUsername(): string | null {
@@ -39,5 +41,13 @@ export class LocalStorageAuthenticationService implements AuthenticationService 
 
   setSonarToken(token: string): void {
     this.storage.setItem(SONAR_TOKEN_KEY, token);
+  }
+
+  getPlatform(): string | null {
+    return this.storage.getItem(PLATFORM_KEY);
+  }
+
+  setPlatform(platform: string): void {
+    this.storage.setItem(PLATFORM_KEY, platform);
   }
 }

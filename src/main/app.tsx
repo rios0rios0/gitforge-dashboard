@@ -17,22 +17,24 @@ import {
 } from "./factories/service_factory";
 
 const authService = createAuthenticationService();
-const repositoryRepository = createRepositoryRepository();
-const contributorRepository = createContributorRepository();
-const dashboardService = createDashboardService(repositoryRepository);
 
 export const App = () => {
-  const { token, username, sonarToken, isAuthenticated, login, logout } =
+  const { token, username, sonarToken, platform, isAuthenticated, login, logout } =
     useAuthentication(authService);
 
-  const contributorService = useMemo(
-    () =>
-      createContributorService(
-        contributorRepository,
-        createSonarCloudRepository(sonarToken ?? undefined),
-      ),
-    [sonarToken],
-  );
+  const dashboardService = useMemo(() => {
+    if (!platform) return null;
+    const repoRepo = createRepositoryRepository(platform);
+    return createDashboardService(repoRepo);
+  }, [platform]);
+
+  const contributorService = useMemo(() => {
+    if (!platform) return null;
+    const contribRepo = createContributorRepository(platform);
+    const sonarRepo = createSonarCloudRepository(sonarToken ?? undefined);
+    return createContributorService(contribRepo, sonarRepo);
+  }, [platform, sonarToken]);
+
   const [activePage, setActivePage] = useState<ActivePage>("dashboard");
   const [lastFetchedAt, setLastFetchedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +56,7 @@ export const App = () => {
 
   const { interval, setInterval } = useAutoRefresh(handleRefresh);
 
-  if (!isAuthenticated || !token || !username) {
+  if (!isAuthenticated || !token || !username || !platform || !dashboardService || !contributorService) {
     return <LoginPage onLogin={login} error={null} />;
   }
 

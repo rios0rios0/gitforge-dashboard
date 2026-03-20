@@ -1,7 +1,8 @@
+import type { Platform } from "../../domain/entities/platform";
 import { AuthGate } from "../components/auth_gate";
 
 interface LoginPageProps {
-  onLogin: (token: string, username: string, sonarToken: string | null) => void;
+  onLogin: (token: string, username: string, sonarToken: string | null, platform: Platform) => void;
   error: string | null;
 }
 
