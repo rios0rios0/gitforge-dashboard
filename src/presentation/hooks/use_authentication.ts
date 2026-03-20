@@ -10,15 +10,21 @@ export interface SonarLoginInfo {
   url?: string;
 }
 
+export interface LoginCredentials {
+  sonar: SonarLoginInfo | null;
+  wakaTimeToken: string | null;
+}
+
 export interface UseAuthenticationResult {
   token: string | null;
   username: string | null;
   sonarToken: string | null;
   sonarType: SonarType | null;
   sonarUrl: string | null;
+  wakaTimeToken: string | null;
   platform: Platform | null;
   isAuthenticated: boolean;
-  login: (token: string, username: string, sonar: SonarLoginInfo | null, platform: Platform) => void;
+  login: (token: string, username: string, credentials: LoginCredentials, platform: Platform) => void;
   logout: () => void;
 }
 
@@ -30,27 +36,32 @@ export const useAuthentication = (authService: AuthenticationService): UseAuthen
     () => (authService.getSonarType() as SonarType) ?? null,
   );
   const [sonarUrl, setSonarUrl] = useState<string | null>(() => authService.getSonarUrl());
+  const [wakaTimeToken, setWakaTimeToken] = useState<string | null>(() => authService.getWakaTimeToken());
   const [platform, setPlatform] = useState<Platform | null>(
     () => (authService.getPlatform() as Platform) ?? null,
   );
 
   const login = useCallback(
-    (newToken: string, newUsername: string, sonar: SonarLoginInfo | null, newPlatform: Platform) => {
+    (newToken: string, newUsername: string, credentials: LoginCredentials, newPlatform: Platform) => {
       authService.setToken(newToken);
       authService.setUsername(newUsername);
       authService.setPlatform(newPlatform);
       setToken(newToken);
       setUsername(newUsername);
       setPlatform(newPlatform);
-      if (sonar) {
-        authService.setSonarToken(sonar.token);
-        authService.setSonarType(sonar.type);
-        setSonarToken(sonar.token);
-        setSonarType(sonar.type);
-        if (sonar.url) {
-          authService.setSonarUrl(sonar.url);
-          setSonarUrl(sonar.url);
+      if (credentials.sonar) {
+        authService.setSonarToken(credentials.sonar.token);
+        authService.setSonarType(credentials.sonar.type);
+        setSonarToken(credentials.sonar.token);
+        setSonarType(credentials.sonar.type);
+        if (credentials.sonar.url) {
+          authService.setSonarUrl(credentials.sonar.url);
+          setSonarUrl(credentials.sonar.url);
         }
+      }
+      if (credentials.wakaTimeToken) {
+        authService.setWakaTimeToken(credentials.wakaTimeToken);
+        setWakaTimeToken(credentials.wakaTimeToken);
       }
     },
     [authService],
@@ -63,10 +74,11 @@ export const useAuthentication = (authService: AuthenticationService): UseAuthen
     setSonarToken(null);
     setSonarType(null);
     setSonarUrl(null);
+    setWakaTimeToken(null);
     setPlatform(null);
   }, [authService]);
 
   const isAuthenticated = useMemo(() => token !== null && username !== null && platform !== null, [token, username, platform]);
 
-  return { token, username, sonarToken, sonarType, sonarUrl, platform, isAuthenticated, login, logout };
+  return { token, username, sonarToken, sonarType, sonarUrl, wakaTimeToken, platform, isAuthenticated, login, logout };
 };

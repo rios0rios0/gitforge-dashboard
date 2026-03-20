@@ -7,6 +7,8 @@ import { AdoRestRepositoryRepository } from "../../infrastructure/repositories/a
 import { GitHubGraphQLContributorRepository } from "../../infrastructure/repositories/github_graphql_contributor_repository";
 import { GitHubGraphQLRepositoryRepository } from "../../infrastructure/repositories/github_graphql_repository_repository";
 import { NoOpSonarRepository, type SonarConfig, SonarRepositoryImpl } from "../../infrastructure/repositories/sonar_repository_impl";
+import type { WakaTimeRepository } from "../../domain/repositories/wakatime_repository";
+import { NoOpWakaTimeRepository, WakaTimeRepositoryImpl } from "../../infrastructure/repositories/wakatime_repository_impl";
 
 const repositoryHandlers: Record<Platform, () => RepositoryRepository> = {
   github: () => new GitHubGraphQLRepositoryRepository(),
@@ -30,3 +32,6 @@ export const createContributorRepository = (platform: Platform): ContributorRepo
 
 export const createSonarRepository = (config?: SonarConfig): SonarRepository =>
   config ? new SonarRepositoryImpl(config) : new NoOpSonarRepository();
+
+export const createWakaTimeRepository = (token?: string): WakaTimeRepository =>
+  token ? new WakaTimeRepositoryImpl(token) : new NoOpWakaTimeRepository();

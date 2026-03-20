@@ -2,6 +2,7 @@ import type { Contributor } from "../domain/entities/contributor";
 import type { SonarMetrics } from "../domain/entities/sonar_metrics";
 import type { ContributorRepository } from "../domain/repositories/contributor_repository";
 import type { AuthorIssues, SonarRepository } from "../domain/repositories/sonar_repository";
+import type { WakaTimeRepository } from "../domain/repositories/wakatime_repository";
 import type { ContributorService } from "../domain/services/contributor_service";
 
 const aggregateProjectMetrics = (
@@ -86,13 +87,16 @@ const matchContributorToAuthor = (
 export class GitHubContributorService implements ContributorService {
   private readonly contributorRepository: ContributorRepository;
   private readonly sonarRepository: SonarRepository;
+  private readonly wakaTimeRepository: WakaTimeRepository;
 
   constructor(
     contributorRepository: ContributorRepository,
     sonarRepository: SonarRepository,
+    wakaTimeRepository: WakaTimeRepository,
   ) {
     this.contributorRepository = contributorRepository;
     this.sonarRepository = sonarRepository;
+    this.wakaTimeRepository = wakaTimeRepository;
   }
 
   async listContributors(
@@ -108,8 +112,19 @@ export class GitHubContributorService implements ContributorService {
       dateTo,
     );
 
+    // Fetch WakaTime summaries
+    const wakaTimeSummaries = await this.wakaTimeRepository.getMemberSummaries(username);
+    const wakaTimeKeys = [...wakaTimeSummaries.keys()];
+
     const projectKeys = await this.sonarRepository.listProjectKeys();
-    if (projectKeys.length === 0) return contributors;
+    if (projectKeys.length === 0) {
+      // No Sonar, but maybe WakaTime
+      if (wakaTimeSummaries.size === 0) return contributors;
+      return contributors.map((c) => {
+        const matchedWaka = matchContributorToAuthor(c.username, wakaTimeKeys);
+        return { ...c, wakaTimeMetrics: matchedWaka ? wakaTimeSummaries.get(matchedWaka) ?? null : null };
+      });
+    }
 
     // Fetch per-author issues from all projects
     const allIssues = await Promise.all(
@@ -134,6 +149,8 @@ export class GitHubContributorService implements ContributorService {
 
       const ratio = totalLines > 0 ? c.linesOfCode / totalLines : 0;
 
+      const matchedWaka = matchContributorToAuthor(c.username, wakaTimeKeys);
+
       return {
         ...c,
         sonarMetrics: {
@@ -148,6 +165,7 @@ export class GitHubContributorService implements ContributorService {
             : "0min",
           qualityGateStatus: "NONE",
         },
+        wakaTimeMetrics: matchedWaka ? wakaTimeSummaries.get(matchedWaka) ?? null : null,
       };
     });
   }

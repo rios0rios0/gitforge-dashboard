@@ -1,9 +1,9 @@
 import { useState } from "react";
 import type { Platform } from "../../domain/entities/platform";
-import type { SonarLoginInfo, SonarType } from "../hooks/use_authentication";
+import type { LoginCredentials, SonarLoginInfo, SonarType } from "../hooks/use_authentication";
 
 interface AuthGateProps {
-  onLogin: (token: string, username: string, sonar: SonarLoginInfo | null, platform: Platform) => void;
+  onLogin: (token: string, username: string, credentials: LoginCredentials, platform: Platform) => void;
   error: string | null;
 }
 
@@ -28,6 +28,7 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
   const [sonarType, setSonarType] = useState<SonarType | "none">("none");
   const [sonarToken, setSonarToken] = useState("");
   const [sonarUrl, setSonarUrl] = useState("");
+  const [wakaTimeToken, setWakaTimeToken] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +43,12 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
           }
         : null;
 
-    onLogin(token.trim(), username.trim(), sonar, platform);
+    const credentials: LoginCredentials = {
+      sonar,
+      wakaTimeToken: wakaTimeToken.trim() || null,
+    };
+
+    onLogin(token.trim(), username.trim(), credentials, platform);
   };
 
   const isGitHub = platform === "github";
@@ -158,6 +164,24 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
               </div>
             </>
           )}
+
+          <div>
+            <label htmlFor="wakaTimeToken" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              WakaTime API Key{" "}
+              <span className="font-normal text-gray-400">(optional)</span>
+            </label>
+            <input
+              id="wakaTimeToken"
+              type="password"
+              value={wakaTimeToken}
+              onChange={(e) => setWakaTimeToken(e.target.value)}
+              placeholder="skip or paste your WakaTime API key"
+              className={inputClass}
+            />
+            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+              Leave blank to skip. Time tracking columns will be hidden.
+            </p>
+          </div>
 
           {error && (
             <div className="rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-400">{error}</div>

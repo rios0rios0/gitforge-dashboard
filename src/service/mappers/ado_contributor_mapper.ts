@@ -75,6 +75,7 @@ export const mapAdoPullRequestsToContributors = (
       totalPipelineRuns: 0,
       successfulPipelineRuns: 0,
       sonarMetrics: null,
+      wakaTimeMetrics: null,
     }),
   );
 };

@@ -1,4 +1,5 @@
 import type { SonarMetrics } from "./sonar_metrics";
+import type { WakaTimeMetrics } from "./wakatime_metrics";
 
 export interface Contributor {
   readonly username: string;
@@ -15,4 +16,5 @@ export interface Contributor {
   readonly totalPipelineRuns: number;
   readonly successfulPipelineRuns: number;
   readonly sonarMetrics: SonarMetrics | null;
+  readonly wakaTimeMetrics: WakaTimeMetrics | null;
 }

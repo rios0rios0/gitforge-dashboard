@@ -4,6 +4,7 @@ import type { DashboardService } from "../../domain/services/dashboard_service";
 import type { ContributorRepository } from "../../domain/repositories/contributor_repository";
 import type { RepositoryRepository } from "../../domain/repositories/repository_repository";
 import type { SonarRepository } from "../../domain/repositories/sonar_repository";
+import type { WakaTimeRepository } from "../../domain/repositories/wakatime_repository";
 import { LocalStorageAuthenticationService } from "../../infrastructure/services/local_storage_authentication_service";
 import { GitHubDashboardService } from "../../service/github_dashboard_service";
 import { GitHubContributorService } from "../../service/github_contributor_service";
@@ -19,5 +20,6 @@ export const createDashboardService = (
 export const createContributorService = (
   contributorRepository: ContributorRepository,
   sonarRepository: SonarRepository,
+  wakaTimeRepository: WakaTimeRepository,
 ): ContributorService =>
-  new GitHubContributorService(contributorRepository, sonarRepository);
+  new GitHubContributorService(contributorRepository, sonarRepository, wakaTimeRepository);

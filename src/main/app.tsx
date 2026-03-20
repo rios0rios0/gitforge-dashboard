@@ -10,6 +10,7 @@ import {
   createContributorRepository,
   createRepositoryRepository,
   createSonarRepository,
+  createWakaTimeRepository,
 } from "./factories/repository_factory";
 import {
   createAuthenticationService,
@@ -21,7 +22,7 @@ import type { SonarConfig } from "../infrastructure/repositories/sonar_repositor
 const authService = createAuthenticationService();
 
 export const App = () => {
-  const { token, username, sonarToken, sonarType, sonarUrl, platform, isAuthenticated, login, logout } =
+  const { token, username, sonarToken, sonarType, sonarUrl, wakaTimeToken, platform, isAuthenticated, login, logout } =
     useAuthentication(authService);
 
   const sonarConfig = useMemo((): SonarConfig | undefined => {
@@ -33,6 +34,7 @@ export const App = () => {
   }, [sonarToken, sonarType, sonarUrl, username]);
 
   const sonarRepo = useMemo(() => createSonarRepository(sonarConfig), [sonarConfig]);
+  const wakaTimeRepo = useMemo(() => createWakaTimeRepository(wakaTimeToken ?? undefined), [wakaTimeToken]);
 
   const dashboardService = useMemo(() => {
     if (!platform) return null;
@@ -43,8 +45,8 @@ export const App = () => {
   const contributorService = useMemo(() => {
     if (!platform) return null;
     const contribRepo = createContributorRepository(platform);
-    return createContributorService(contribRepo, sonarRepo);
-  }, [platform, sonarRepo]);
+    return createContributorService(contribRepo, sonarRepo, wakaTimeRepo);
+  }, [platform, sonarRepo, wakaTimeRepo]);
 
   const [activePage, setActivePage] = useState<ActivePage>("dashboard");
   const [lastFetchedAt, setLastFetchedAt] = useState<Date | null>(null);

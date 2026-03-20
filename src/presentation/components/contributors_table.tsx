@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -11,6 +11,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { Contributor } from "../../domain/entities/contributor";
+import { formatDuration } from "../../domain/entities/wakatime_metrics";
 
 interface ContributorsTableProps {
   contributors: Contributor[];
@@ -163,6 +164,31 @@ const columns: ColumnDef<Contributor>[] = [
   },
 ];
 
+const wakaTimeColumns: ColumnDef<Contributor>[] = [
+  {
+    id: "totalTime",
+    accessorFn: (row) => row.wakaTimeMetrics?.totalSeconds ?? 0,
+    header: "Total Time (30d)",
+    cell: ({ row }) => {
+      const metrics = row.original.wakaTimeMetrics;
+      if (!metrics) return <span className="text-xs text-gray-400 dark:text-gray-500">-</span>;
+      return <span className="text-sm text-gray-700 dark:text-gray-300">{formatDuration(metrics.totalSeconds)}</span>;
+    },
+    enableColumnFilter: false,
+  },
+  {
+    id: "dailyAverage",
+    accessorFn: (row) => row.wakaTimeMetrics?.dailyAverageSeconds ?? 0,
+    header: "Daily Avg",
+    cell: ({ row }) => {
+      const metrics = row.original.wakaTimeMetrics;
+      if (!metrics) return <span className="text-xs text-gray-400 dark:text-gray-500">-</span>;
+      return <span className="text-sm text-gray-700 dark:text-gray-300">{formatDuration(metrics.dailyAverageSeconds)}</span>;
+    },
+    enableColumnFilter: false,
+  },
+];
+
 const ColumnFilter = ({ column }: { column: { getFilterValue: () => unknown; setFilterValue: (v: unknown) => void } }) => (
   <input
     type="text"
@@ -198,9 +224,15 @@ export const ContributorsTable = ({
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
+  const hasWakaTime = contributors.some((c) => c.wakaTimeMetrics !== null);
+  const allColumns = useMemo(
+    () => (hasWakaTime ? [...columns, ...wakaTimeColumns] : columns),
+    [hasWakaTime],
+  );
+
   const table = useReactTable({
     data: contributors,
-    columns,
+    columns: allColumns,
     state: { sorting, columnFilters },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

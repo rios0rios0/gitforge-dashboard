@@ -91,6 +91,7 @@ export const mapPullRequestsToContributors = (
       totalPipelineRuns: acc.totalPipelineRuns,
       successfulPipelineRuns: acc.successfulPipelineRuns,
       sonarMetrics: null,
+      wakaTimeMetrics: null,
     }),
   );
 };

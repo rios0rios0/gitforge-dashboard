@@ -3,6 +3,13 @@ import { GitHubContributorService } from "../../src/service/github_contributor_s
 import { ContributorBuilder } from "../builders/contributor_builder";
 import { StubContributorRepository } from "../doubles/stub_contributor_repository";
 import { StubSonarRepository } from "../doubles/stub_sonar_repository";
+import { StubWakaTimeRepository } from "../doubles/stub_wakatime_repository";
+
+const createService = (
+  contributorRepo: StubContributorRepository,
+  sonarRepo = new StubSonarRepository(),
+  wakaTimeRepo = new StubWakaTimeRepository(),
+) => new GitHubContributorService(contributorRepo, sonarRepo, wakaTimeRepo);
 
 describe("GitHubContributorService", () => {
   it("should return contributors without Sonar metrics when no projects exist", async () => {
@@ -11,8 +18,7 @@ describe("GitHubContributorService", () => {
       ContributorBuilder.create().withUsername("alice").withLinesOfCode(500).build(),
     ];
     const contributorRepo = new StubContributorRepository().withContributors(contributors);
-    const sonarRepo = new StubSonarRepository().withProjectKeys([]);
-    const service = new GitHubContributorService(contributorRepo, sonarRepo);
+    const service = createService(contributorRepo);
 
     // when
     const result = await service.listContributors("token", "user", null, null);
@@ -47,7 +53,7 @@ describe("GitHubContributorService", () => {
         qualityGateStatus: "OK",
       })
       .withAuthorIssues("proj-1", authorIssues);
-    const service = new GitHubContributorService(contributorRepo, sonarRepo);
+    const service = createService(contributorRepo, sonarRepo);
 
     // when
     const result = await service.listContributors("token", "user", null, null);
@@ -69,7 +75,7 @@ describe("GitHubContributorService", () => {
     const sonarRepo = new StubSonarRepository()
       .withProjectKeys(["proj-1"])
       .withProjectMetrics("proj-1", null);
-    const service = new GitHubContributorService(contributorRepo, sonarRepo);
+    const service = createService(contributorRepo, sonarRepo);
 
     // when
     const result = await service.listContributors("token", "user", null, null);
@@ -79,11 +85,28 @@ describe("GitHubContributorService", () => {
     expect(result[0].sonarMetrics).toBeNull();
   });
 
+  it("should merge WakaTime summaries into contributors", async () => {
+    // given
+    const contributors = [
+      ContributorBuilder.create().withUsername("alice").withLinesOfCode(500).build(),
+    ];
+    const contributorRepo = new StubContributorRepository().withContributors(contributors);
+    const wakaTimeRepo = new StubWakaTimeRepository()
+      .withSummary("alice", { totalSeconds: 36000, dailyAverageSeconds: 7200 });
+    const service = createService(contributorRepo, new StubSonarRepository(), wakaTimeRepo);
+
+    // when
+    const result = await service.listContributors("token", "user", null, null);
+
+    // then
+    expect(result[0].wakaTimeMetrics?.totalSeconds).toBe(36000);
+    expect(result[0].wakaTimeMetrics?.dailyAverageSeconds).toBe(7200);
+  });
+
   it("should propagate error when contributor repository fetch fails", async () => {
     // given
     const contributorRepo = new StubContributorRepository().withError(new Error("API failure"));
-    const sonarRepo = new StubSonarRepository();
-    const service = new GitHubContributorService(contributorRepo, sonarRepo);
+    const service = createService(contributorRepo);
 
     // when / then
     await expect(service.listContributors("token", "user", null, null)).rejects.toThrow(

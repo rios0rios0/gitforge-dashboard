@@ -23,6 +23,7 @@ export class ContributorBuilder {
       totalPipelineRuns: 10,
       successfulPipelineRuns: 9,
       sonarMetrics: null,
+      wakaTimeMetrics: null,
     };
   }
 

@@ -10,6 +10,8 @@ export interface AuthenticationService {
   setSonarType(type: string): void;
   getSonarUrl(): string | null;
   setSonarUrl(url: string): void;
+  getWakaTimeToken(): string | null;
+  setWakaTimeToken(token: string): void;
   getPlatform(): string | null;
   setPlatform(platform: string): void;
 }
