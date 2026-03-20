@@ -1,7 +1,7 @@
 import { AuthGate } from "../components/auth_gate";
 
 interface LoginPageProps {
-  onLogin: (token: string, username: string) => void;
+  onLogin: (token: string, username: string, sonarToken: string | null) => void;
   error: string | null;
 }
 

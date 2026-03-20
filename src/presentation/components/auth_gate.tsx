@@ -1,18 +1,19 @@
 import { useState } from "react";
 
 interface AuthGateProps {
-  onLogin: (token: string, username: string) => void;
+  onLogin: (token: string, username: string, sonarToken: string | null) => void;
   error: string | null;
 }
 
 export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
   const [token, setToken] = useState("");
   const [username, setUsername] = useState("");
+  const [sonarToken, setSonarToken] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (token.trim() && username.trim()) {
-      onLogin(token.trim(), username.trim());
+      onLogin(token.trim(), username.trim(), sonarToken.trim() || null);
     }
   };
 
@@ -55,6 +56,24 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
             />
           </div>
 
+          <div>
+            <label htmlFor="sonarToken" className="mb-1 block text-sm font-medium text-gray-700">
+              SonarCloud Token{" "}
+              <span className="font-normal text-gray-400">(optional)</span>
+            </label>
+            <input
+              id="sonarToken"
+              type="password"
+              value={sonarToken}
+              onChange={(e) => setSonarToken(e.target.value)}
+              placeholder="skip or paste your SonarCloud token"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            />
+            <p className="mt-1 text-xs text-gray-400">
+              Leave blank to skip. SonarCloud columns will show &ldquo;-&rdquo;.
+            </p>
+          </div>
+
           {error && (
             <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
           )}
@@ -74,7 +93,7 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
             <li>Repository access: All repositories</li>
             <li>Permissions: Metadata (read-only)</li>
           </ul>
-          <p className="mt-1">Your token is stored locally and never sent to any server except GitHub's API.</p>
+          <p className="mt-1">Your tokens are stored locally and never sent to any server except their respective APIs.</p>
         </div>
       </div>
     </div>

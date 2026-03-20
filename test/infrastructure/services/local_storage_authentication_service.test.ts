@@ -68,10 +68,11 @@ describe("LocalStorageAuthenticationService", () => {
     expect(result).toBe("testuser");
   });
 
-  it("should clear token and username when clearToken is called", () => {
+  it("should clear token, username, and sonar token when clearToken is called", () => {
     // given
     service.setToken("ghp_test123");
     service.setUsername("testuser");
+    service.setSonarToken("squ_sonar123");
 
     // when
     service.clearToken();
@@ -79,5 +80,25 @@ describe("LocalStorageAuthenticationService", () => {
     // then
     expect(service.getToken()).toBeNull();
     expect(service.getUsername()).toBeNull();
+    expect(service.getSonarToken()).toBeNull();
+  });
+
+  it("should return sonar token when sonar token was previously set", () => {
+    // given
+    service.setSonarToken("squ_sonar123");
+
+    // when
+    const result = service.getSonarToken();
+
+    // then
+    expect(result).toBe("squ_sonar123");
+  });
+
+  it("should return null when no sonar token exists", () => {
+    // when
+    const result = service.getSonarToken();
+
+    // then
+    expect(result).toBeNull();
   });
 });

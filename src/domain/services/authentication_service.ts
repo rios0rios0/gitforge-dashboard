@@ -4,4 +4,6 @@ export interface AuthenticationService {
   clearToken(): void;
   getUsername(): string | null;
   setUsername(username: string): void;
+  getSonarToken(): string | null;
+  setSonarToken(token: string): void;
 }
