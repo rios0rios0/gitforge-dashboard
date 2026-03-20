@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import type { DashboardService } from "../../domain/services/dashboard_service";
+import type { SortField } from "../../domain/entities/dashboard_filter";
 import { FilterBar } from "../components/filter_bar";
-import { RepositoryGrid } from "../components/repository_grid";
+import { RepositoryTable } from "../components/repository_table";
 import { useFilters } from "../hooks/use_filters";
 import { useRepositories } from "../hooks/use_repositories";
 
@@ -30,6 +31,19 @@ export const DashboardPage = ({
     onRefetchRef?.(refetch);
   }, [onRefetchRef, refetch]);
 
+  const handleSortChange = useCallback(
+    (field: SortField) => {
+      if (filter.sortField === field) {
+        updateFilter({
+          sortDirection: filter.sortDirection === "asc" ? "desc" : "asc",
+        });
+      } else {
+        updateFilter({ sortField: field, sortDirection: "asc" });
+      }
+    },
+    [filter.sortField, filter.sortDirection, updateFilter],
+  );
+
   return (
     <div>
       {error && (
@@ -43,10 +57,12 @@ export const DashboardPage = ({
         onReset={resetFilters}
       />
 
-      <RepositoryGrid
+      <RepositoryTable
         repositories={filteredRepositories}
         totalCount={repositories.length}
         isLoading={isLoading}
+        filter={filter}
+        onSortChange={handleSortChange}
       />
     </div>
   );

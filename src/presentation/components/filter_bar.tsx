@@ -2,8 +2,6 @@ import type {
   CIFilter,
   DashboardFilter,
   ReleaseFilter,
-  SortDirection,
-  SortField,
 } from "../../domain/entities/dashboard_filter";
 
 interface FilterBarProps {
@@ -57,26 +55,6 @@ export const FilterBar = ({ filter, languages, onFilterChange, onReset }: Filter
         </option>
       ))}
     </select>
-
-    <select
-      value={filter.sortField}
-      onChange={(e) => onFilterChange({ sortField: e.target.value as SortField })}
-      className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
-    >
-      <option value="name">Sort: Name</option>
-      <option value="updatedAt">Sort: Updated</option>
-      <option value="ciStatus">Sort: CI Status</option>
-      <option value="releaseDate">Sort: Release Date</option>
-    </select>
-
-    <button
-      onClick={() =>
-        onFilterChange({ sortDirection: filter.sortDirection === "asc" ? "desc" : "asc" as SortDirection })
-      }
-      className="rounded-md border border-gray-300 px-2 py-1.5 text-sm hover:bg-gray-50"
-    >
-      {filter.sortDirection === "asc" ? "Asc" : "Desc"}
-    </button>
 
     <label className="flex items-center gap-1 text-sm text-gray-600">
       <input
