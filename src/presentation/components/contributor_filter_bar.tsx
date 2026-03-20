@@ -32,35 +32,35 @@ export const ContributorFilterBar = ({
   onDateRangeApply,
   onReset,
 }: ContributorFilterBarProps) => (
-  <div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-white p-4">
+  <div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
     <input
       type="text"
       placeholder="Search contributors..."
       aria-label="Search contributors"
       value={filter.searchQuery}
       onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
-      className="min-w-48 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
+      className="min-w-48 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
     />
 
     <div className="flex items-center gap-2">
-      <label className="text-sm text-gray-600">From:</label>
+      <label className="text-sm text-gray-600 dark:text-gray-300">From:</label>
       <input
         type="date"
         aria-label="Date from"
         value={filter.dateFrom ?? ""}
         onChange={(e) => onFilterChange({ dateFrom: e.target.value || null })}
-        className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+        className="rounded-md border border-gray-300 px-2 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
       />
     </div>
 
     <div className="flex items-center gap-2">
-      <label className="text-sm text-gray-600">To:</label>
+      <label className="text-sm text-gray-600 dark:text-gray-300">To:</label>
       <input
         type="date"
         aria-label="Date to"
         value={filter.dateTo ?? ""}
         onChange={(e) => onFilterChange({ dateTo: e.target.value || null })}
-        className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+        className="rounded-md border border-gray-300 px-2 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
       />
     </div>
 
@@ -76,7 +76,7 @@ export const ContributorFilterBar = ({
       onChange={(e) =>
         onFilterChange({ sortField: e.target.value as ContributorSortField })
       }
-      className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+      className="rounded-md border border-gray-300 px-2 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
     >
       {SORT_OPTIONS.map(({ value, label }) => (
         <option key={value} value={value}>
@@ -92,14 +92,14 @@ export const ContributorFilterBar = ({
             filter.sortDirection === "asc" ? ("desc" as SortDirection) : ("asc" as SortDirection),
         })
       }
-      className="rounded-md border border-gray-300 px-2 py-1.5 text-sm hover:bg-gray-50"
+      className="rounded-md border border-gray-300 px-2 py-1.5 text-sm hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
     >
       {filter.sortDirection === "asc" ? "Asc" : "Desc"}
     </button>
 
     <button
       onClick={onReset}
-      className="ml-auto rounded-md px-2 py-1.5 text-sm text-gray-500 hover:text-gray-700"
+      className="ml-auto rounded-md px-2 py-1.5 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
     >
       Reset
     </button>

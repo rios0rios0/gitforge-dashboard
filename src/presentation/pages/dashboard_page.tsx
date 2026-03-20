@@ -47,7 +47,7 @@ export const DashboardPage = ({
   return (
     <div>
       {error && (
-        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
+        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-400">{error}</div>
       )}
 
       <FilterBar

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useAuthentication } from "../presentation/hooks/use_authentication";
 import { useAutoRefresh } from "../presentation/hooks/use_auto_refresh";
+import { useTheme } from "../presentation/hooks/use_theme";
 import { Navigation, type ActivePage } from "../presentation/components/navigation";
 import { DashboardPage } from "../presentation/pages/dashboard_page";
 import { ContributorsPage } from "../presentation/pages/contributors_page";
@@ -55,13 +56,14 @@ export const App = () => {
   }, []);
 
   const { interval, setInterval } = useAutoRefresh(handleRefresh);
+  const { theme, toggleTheme } = useTheme();
 
   if (!isAuthenticated || !token || !username || !platform || !dashboardService || !contributorService) {
     return <LoginPage onLogin={login} error={null} />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
       <div className="mx-auto max-w-7xl px-4 py-6">
         <Navigation
           activePage={activePage}
@@ -69,9 +71,11 @@ export const App = () => {
           lastFetchedAt={lastFetchedAt}
           refreshInterval={interval}
           isLoading={isLoading}
+          theme={theme}
           onPageChange={setActivePage}
           onRefresh={handleRefresh}
           onIntervalChange={setInterval}
+          onToggleTheme={toggleTheme}
           onLogout={logout}
         />
 
