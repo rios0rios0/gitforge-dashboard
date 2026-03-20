@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - added contributors metrics dashboard with SonarCloud integration and proportional metric distribution
+- added optional SonarCloud token prompt on the login page with skip support
 - added service-layer tests for `GitHubContributorService` covering aggregation, distribution, and error scenarios
 
 ### Changed

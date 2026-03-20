@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useAuthentication } from "../presentation/hooks/use_authentication";
 import { useAutoRefresh } from "../presentation/hooks/use_auto_refresh";
 import { Navigation, type ActivePage } from "../presentation/components/navigation";
@@ -19,12 +19,20 @@ import {
 const authService = createAuthenticationService();
 const repositoryRepository = createRepositoryRepository();
 const contributorRepository = createContributorRepository();
-const sonarCloudRepository = createSonarCloudRepository();
 const dashboardService = createDashboardService(repositoryRepository);
-const contributorService = createContributorService(contributorRepository, sonarCloudRepository);
 
 export const App = () => {
-  const { token, username, isAuthenticated, login, logout } = useAuthentication(authService);
+  const { token, username, sonarToken, isAuthenticated, login, logout } =
+    useAuthentication(authService);
+
+  const contributorService = useMemo(
+    () =>
+      createContributorService(
+        contributorRepository,
+        createSonarCloudRepository(sonarToken ?? undefined),
+      ),
+    [sonarToken],
+  );
   const [activePage, setActivePage] = useState<ActivePage>("dashboard");
   const [lastFetchedAt, setLastFetchedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
