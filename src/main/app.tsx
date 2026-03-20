@@ -26,12 +26,22 @@ const contributorService = createContributorService(contributorRepository, sonar
 export const App = () => {
   const { token, username, isAuthenticated, login, logout } = useAuthentication(authService);
   const [activePage, setActivePage] = useState<ActivePage>("dashboard");
-  const [lastFetchedAt] = useState<Date | null>(null);
-  const [isLoading] = useState(false);
+  const [lastFetchedAt, setLastFetchedAt] = useState<Date | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const dashboardRefetchRef = useRef<(() => Promise<void>) | null>(null);
 
-  const handleRefresh = useCallback(() => {
-    dashboardRefetchRef.current?.();
+  const handleRefresh = useCallback(async () => {
+    if (!dashboardRefetchRef.current) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await dashboardRefetchRef.current();
+      setLastFetchedAt(new Date());
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const { interval, setInterval } = useAutoRefresh(handleRefresh);

@@ -74,7 +74,7 @@ export class GitHubGraphQLContributorRepository implements ContributorRepository
     let cursor: string | null = null;
 
     const dateFilter = buildDateFilter(dateFrom, dateTo);
-    const searchQuery = `type:pr user:${username} is:merged ${dateFilter}`.trim();
+    const searchQuery = `type:pr user:${username} ${dateFilter}`.trim();
 
     for (;;) {
       const response = await graphqlRequest<SearchQueryResponse>(token, CONTRIBUTOR_QUERY, {

@@ -40,7 +40,7 @@ describe("mapPullRequestsToContributors", () => {
     expect(result[0].linesOfCode).toBe(430);
   });
 
-  it("should count approved PRs from reviews and merged state", () => {
+  it("should count approved PRs only from APPROVED review state", () => {
     // given
     const prs = [
       createPR({
@@ -59,7 +59,8 @@ describe("mapPullRequestsToContributors", () => {
     const result = mapPullRequestsToContributors(prs);
 
     // then
-    expect(result[0].approvedPRs).toBe(2);
+    expect(result[0].approvedPRs).toBe(1);
+    expect(result[0].totalPRs).toBe(2);
   });
 
   it("should count rejected PRs from CHANGES_REQUESTED reviews", () => {

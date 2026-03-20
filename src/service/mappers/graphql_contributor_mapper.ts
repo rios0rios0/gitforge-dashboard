@@ -55,7 +55,7 @@ export const mapPullRequestsToContributors = (
     acc.linesAdded += pr.additions;
     acc.linesDeleted += pr.deletions;
 
-    if (hasReviewState(pr, "APPROVED") || pr.state === "MERGED") {
+    if (hasReviewState(pr, "APPROVED")) {
       acc.approvedPRs++;
     }
     if (hasReviewState(pr, "CHANGES_REQUESTED")) {

@@ -25,13 +25,28 @@ const SortHeader = ({
   const isActive = currentField === field;
   return (
     <th
-      className="cursor-pointer whitespace-nowrap px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500 hover:text-gray-700"
-      onClick={() => onClick(field)}
+      scope="col"
+      aria-sort={
+        isActive
+          ? currentDirection === "asc"
+            ? "ascending"
+            : "descending"
+          : "none"
+      }
+      className="whitespace-nowrap px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
     >
-      {label}
-      {isActive && (
-        <span className="ml-1">{currentDirection === "asc" ? "\u25B2" : "\u25BC"}</span>
-      )}
+      <button
+        type="button"
+        className="inline-flex w-full items-center text-left cursor-pointer hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+        onClick={() => onClick(field)}
+      >
+        <span>{label}</span>
+        {isActive && (
+          <span className="ml-1" aria-hidden="true">
+            {currentDirection === "asc" ? "\u25B2" : "\u25BC"}
+          </span>
+        )}
+      </button>
     </th>
   );
 };
@@ -42,7 +57,7 @@ const LoadingSkeleton = () => (
   <tbody>
     {Array.from({ length: 5 }, (_, i) => (
       <tr key={i} className="animate-pulse">
-        {Array.from({ length: 13 }, (_, j) => (
+        {Array.from({ length: 12 }, (_, j) => (
           <td key={j} className="px-3 py-3">
             <div className="h-4 w-16 rounded bg-gray-200" />
           </td>

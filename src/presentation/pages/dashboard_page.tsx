@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { DashboardService } from "../../domain/services/dashboard_service";
 import { FilterBar } from "../components/filter_bar";
 import { RepositoryGrid } from "../components/repository_grid";
@@ -25,10 +26,9 @@ export const DashboardPage = ({
   const { filter, filteredRepositories, languages, updateFilter, resetFilters } =
     useFilters(repositories);
 
-  // Expose refetch to parent for auto-refresh
-  if (onRefetchRef) {
-    onRefetchRef(refetch);
-  }
+  useEffect(() => {
+    onRefetchRef?.(refetch);
+  }, [onRefetchRef, refetch]);
 
   return (
     <div>

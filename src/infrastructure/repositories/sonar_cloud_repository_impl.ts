@@ -59,7 +59,10 @@ export class SonarCloudRepositoryImpl implements SonarCloudRepository {
     this.sonarToken = sonarToken;
   }
 
-  async getMetricsByAuthor(): Promise<SonarCloudMetrics | null> {
+  async getMetricsByAuthor(
+    _organization: string,
+    _author: string,
+  ): Promise<SonarCloudMetrics | null> {
     return null;
   }
 
@@ -101,15 +104,18 @@ export class SonarCloudRepositoryImpl implements SonarCloudRepository {
 }
 
 export class NoOpSonarCloudRepository implements SonarCloudRepository {
-  async getMetricsByAuthor(): Promise<SonarCloudMetrics | null> {
+  async getMetricsByAuthor(
+    _organization: string,
+    _author: string,
+  ): Promise<SonarCloudMetrics | null> {
     return null;
   }
 
-  async getProjectMetrics(): Promise<SonarCloudMetrics | null> {
+  async getProjectMetrics(_projectKey: string): Promise<SonarCloudMetrics | null> {
     return null;
   }
 
-  async listProjectKeys(): Promise<string[]> {
+  async listProjectKeys(_organization: string): Promise<string[]> {
     return [];
   }
 }
