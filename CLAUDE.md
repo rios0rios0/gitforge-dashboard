@@ -55,7 +55,9 @@ src/main/             → DI wiring via factories, app entry point
 
 ## Testing
 
-39 tests across 6 test files covering domain logic, service layer, infrastructure, and presentation components. All tests use Vitest + Testing Library.
+A comprehensive test suite covers domain logic, service layer, infrastructure, and presentation components. All tests use Vitest + Testing Library.
+
+Coverage thresholds enforced at 90%+ lines/functions/statements and 77%+ branches. CI posts a coverage PR comment, test result annotations, and uploads the HTML coverage report as an artifact.
 
 ```bash
 make test              # Full suite (ALWAYS use this)

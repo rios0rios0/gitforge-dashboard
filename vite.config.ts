@@ -10,8 +10,13 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: ["./test/setup.ts"],
+    reporters: ["default", "junit"],
+    outputFile: {
+      junit: "junit-report.xml",
+    },
     coverage: {
       provider: "v8",
+      reporter: ["text", "json", "json-summary", "html"],
       include: ["src/**/*.{ts,tsx}"],
       exclude: [
         // Type-only files (interfaces, type aliases, no executable code)
@@ -36,10 +41,10 @@ export default defineConfig({
         "src/presentation/pages/login_page.tsx",
       ],
       thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 75,
-        statements: 80,
+        lines: 90,
+        functions: 90,
+        branches: 77,
+        statements: 90,
       },
     },
   },
