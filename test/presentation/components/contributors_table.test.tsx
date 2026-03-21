@@ -122,9 +122,11 @@ describe("ContributorsTable", () => {
   it("should show WakaTime columns when any contributor has wakaTimeMetrics", () => {
     // given
     const contributors = [
-      ContributorBuilder.create().withUsername("alice").build(),
+      {
+        ...ContributorBuilder.create().withUsername("alice").build(),
+        wakaTimeMetrics: { totalSeconds: 3600, dailyAverageSeconds: 1800 },
+      },
     ];
-    contributors[0].wakaTimeMetrics = { totalSeconds: 3600, dailyAverageSeconds: 1800 };
 
     // when
     render(

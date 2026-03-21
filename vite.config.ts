@@ -14,7 +14,7 @@ export default defineConfig({
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
       exclude: [
-        "src/main/main.tsx",
+        // Type-only files (interfaces, type aliases, no executable code)
         "src/**/*.d.ts",
         "src/domain/entities/platform.ts",
         "src/domain/entities/repository.ts",
@@ -26,8 +26,13 @@ export default defineConfig({
         "src/domain/repositories/**",
         "src/domain/services/**",
         "src/service/mappers/*_node.ts",
+        // Entry point (single ReactDOM.createRoot call)
+        "src/main/main.tsx",
+        // Uses IndexedDB (unavailable in jsdom); 46 lines with in-memory fallback
         "src/infrastructure/crypto/crypto_key_store.ts",
+        // Root orchestrator with async init + many wired dependencies; tested indirectly via page/component tests
         "src/main/app.tsx",
+        // Trivial wrapper (12 lines) delegating entirely to AuthGate which is fully tested
         "src/presentation/pages/login_page.tsx",
       ],
       thresholds: {

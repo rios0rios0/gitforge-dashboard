@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import { useContributors } from "../../../src/presentation/hooks/use_contributors";
 import { StubContributorService } from "../../doubles/stub_contributor_service";
@@ -61,6 +61,7 @@ describe("useContributors", () => {
   it("should pass dateFrom and dateTo to refetch", async () => {
     // given
     const service = new StubContributorService().withContributors([]);
+    const listSpy = vi.spyOn(service, "listContributors");
     const { result } = renderHook(() => useContributors(service, "token", "user"));
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
@@ -70,7 +71,7 @@ describe("useContributors", () => {
     });
 
     // then
-    expect(result.current.isLoading).toBe(false);
+    expect(listSpy).toHaveBeenLastCalledWith("token", "user", "2026-01-01", "2026-02-01");
   });
 
   it("should set lastFetchedAt after successful fetch", async () => {

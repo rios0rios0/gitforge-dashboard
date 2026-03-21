@@ -158,20 +158,20 @@ describe("RepositoryTable", () => {
   it("should render Sonar quality gate Passed status", () => {
     // given
     const repos = [
-      RepositoryBuilder.create()
-        .withName("sonar-ok")
-        .build(),
+      {
+        ...RepositoryBuilder.create().withName("sonar-ok").build(),
+        sonarMetrics: {
+          bugs: 0,
+          codeSmells: 0,
+          securityHotspots: 0,
+          vulnerabilities: 0,
+          coverage: 90,
+          duplications: 1,
+          technicalDebt: "0min",
+          qualityGateStatus: "OK" as const,
+        },
+      },
     ];
-    repos[0].sonarMetrics = {
-      bugs: 0,
-      codeSmells: 0,
-      securityHotspots: 0,
-      vulnerabilities: 0,
-      coverage: 90,
-      duplications: 1,
-      technicalDebt: "0min",
-      qualityGateStatus: "OK",
-    };
 
     // when
     render(<RepositoryTable repositories={repos} totalCount={1} isLoading={false} />);
@@ -183,20 +183,20 @@ describe("RepositoryTable", () => {
   it("should render Sonar quality gate Failed status", () => {
     // given
     const repos = [
-      RepositoryBuilder.create()
-        .withName("sonar-fail")
-        .build(),
+      {
+        ...RepositoryBuilder.create().withName("sonar-fail").build(),
+        sonarMetrics: {
+          bugs: 5,
+          codeSmells: 10,
+          securityHotspots: 1,
+          vulnerabilities: 2,
+          coverage: 20,
+          duplications: 15,
+          technicalDebt: "5d",
+          qualityGateStatus: "ERROR" as const,
+        },
+      },
     ];
-    repos[0].sonarMetrics = {
-      bugs: 5,
-      codeSmells: 10,
-      securityHotspots: 1,
-      vulnerabilities: 2,
-      coverage: 20,
-      duplications: 15,
-      technicalDebt: "5d",
-      qualityGateStatus: "ERROR",
-    };
 
     // when
     render(<RepositoryTable repositories={repos} totalCount={1} isLoading={false} />);
