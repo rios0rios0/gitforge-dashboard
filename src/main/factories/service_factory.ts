@@ -5,12 +5,15 @@ import type { ContributorRepository } from "../../domain/repositories/contributo
 import type { RepositoryRepository } from "../../domain/repositories/repository_repository";
 import type { SonarRepository } from "../../domain/repositories/sonar_repository";
 import type { WakaTimeRepository } from "../../domain/repositories/wakatime_repository";
+import { EncryptedAuthenticationService } from "../../infrastructure/services/encrypted_authentication_service";
 import { LocalStorageAuthenticationService } from "../../infrastructure/services/local_storage_authentication_service";
 import { GitHubDashboardService } from "../../service/github_dashboard_service";
 import { GitHubContributorService } from "../../service/github_contributor_service";
 
-export const createAuthenticationService = (): AuthenticationService =>
-  new LocalStorageAuthenticationService();
+export const createAuthenticationService = async (): Promise<AuthenticationService> => {
+  const delegate = new LocalStorageAuthenticationService();
+  return EncryptedAuthenticationService.create(delegate);
+};
 
 export const createDashboardService = (
   repositoryRepository: RepositoryRepository,

@@ -1,7 +1,7 @@
 import type { RefreshInterval } from "../hooks/use_auto_refresh";
 import type { Theme } from "../hooks/use_theme";
 
-export type ActivePage = "dashboard" | "contributors";
+export type ActivePage = "dashboard" | "contributors" | "settings";
 
 interface NavigationProps {
   activePage: ActivePage;
@@ -30,6 +30,7 @@ const INTERVAL_OPTIONS: { value: RefreshInterval; label: string }[] = [
 const NAV_ITEMS: { page: ActivePage; label: string }[] = [
   { page: "dashboard", label: "Repositories" },
   { page: "contributors", label: "Contributors" },
+  { page: "settings", label: "Settings" },
 ];
 
 export const Navigation = ({

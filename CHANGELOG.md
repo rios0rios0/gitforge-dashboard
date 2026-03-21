@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- added Settings page with per-integration token management for VCS, Sonar, and WakaTime
+- added individual disconnect for optional integrations (Sonar, WakaTime) without full logout
+- added Web Crypto AES-GCM encryption layer for token storage in `localStorage`
+- added `IntegrationCard` reusable component for displaying integration connection status
 - added contributors metrics dashboard with SonarCloud integration and proportional metric distribution
 - added optional SonarCloud token prompt on the login page with skip support
 - added Azure DevOps support via Adapter Design Pattern (repositories, CI status, tags, contributors)

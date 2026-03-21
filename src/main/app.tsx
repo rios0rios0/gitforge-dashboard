@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { AuthenticationService } from "../domain/services/authentication_service";
 import { useAuthentication } from "../presentation/hooks/use_authentication";
 import { useAutoRefresh } from "../presentation/hooks/use_auto_refresh";
 import { useTheme } from "../presentation/hooks/use_theme";
@@ -6,6 +7,7 @@ import { Navigation, type ActivePage } from "../presentation/components/navigati
 import { DashboardPage } from "../presentation/pages/dashboard_page";
 import { ContributorsPage } from "../presentation/pages/contributors_page";
 import { LoginPage } from "../presentation/pages/login_page";
+import { SettingsPage } from "../presentation/pages/settings_page";
 import {
   createContributorRepository,
   createRepositoryRepository,
@@ -19,11 +21,29 @@ import {
 } from "./factories/service_factory";
 import type { SonarConfig } from "../infrastructure/repositories/sonar_repository_impl";
 
-const authService = createAuthenticationService();
-
 export const App = () => {
-  const { token, username, sonarToken, sonarType, sonarUrl, wakaTimeToken, platform, isAuthenticated, login, logout } =
-    useAuthentication(authService);
+  const [authService, setAuthService] = useState<AuthenticationService | null>(null);
+
+  useEffect(() => {
+    createAuthenticationService().then(setAuthService);
+  }, []);
+
+  if (!authService) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <p className="text-sm text-gray-500 dark:text-gray-400">Initializing...</p>
+      </div>
+    );
+  }
+
+  return <AppContent authService={authService} />;
+};
+
+const AppContent = ({ authService }: { authService: AuthenticationService }) => {
+  const {
+    token, username, sonarToken, sonarType, sonarUrl, wakaTimeToken, platform,
+    isAuthenticated, login, logout, updateVcsCredentials, updateSonarConfig, updateWakaTimeToken,
+  } = useAuthentication(authService);
 
   const sonarConfig = useMemo((): SonarConfig | undefined => {
     if (!sonarToken || !sonarType) return undefined;
@@ -107,6 +127,21 @@ export const App = () => {
             contributorService={contributorService}
             token={token}
             username={username}
+          />
+        )}
+
+        {activePage === "settings" && (
+          <SettingsPage
+            token={token}
+            username={username}
+            platform={platform}
+            sonarToken={sonarToken}
+            sonarType={sonarType}
+            sonarUrl={sonarUrl}
+            wakaTimeToken={wakaTimeToken}
+            onUpdateVcs={updateVcsCredentials}
+            onUpdateSonar={updateSonarConfig}
+            onUpdateWakaTime={updateWakaTimeToken}
           />
         )}
       </div>
