@@ -26,6 +26,9 @@ export interface UseAuthenticationResult {
   isAuthenticated: boolean;
   login: (token: string, username: string, credentials: LoginCredentials, platform: Platform) => void;
   logout: () => void;
+  updateVcsCredentials: (token: string, username: string, platform: Platform) => void;
+  updateSonarConfig: (sonar: SonarLoginInfo | null) => void;
+  updateWakaTimeToken: (token: string | null) => void;
 }
 
 const isValidSonarType = (value: string | null): value is SonarType => value === "cloud" || value === "qube";
@@ -92,7 +95,58 @@ export const useAuthentication = (authService: AuthenticationService): UseAuthen
     setPlatform(null);
   }, [authService]);
 
+  const updateVcsCredentials = useCallback(
+    (newToken: string, newUsername: string, newPlatform: Platform) => {
+      authService.setToken(newToken);
+      authService.setUsername(newUsername);
+      authService.setPlatform(newPlatform);
+      setToken(newToken);
+      setUsername(newUsername);
+      setPlatform(newPlatform);
+    },
+    [authService],
+  );
+
+  const updateSonarConfig = useCallback(
+    (sonar: SonarLoginInfo | null) => {
+      if (sonar) {
+        authService.setSonarToken(sonar.token);
+        authService.setSonarType(sonar.type);
+        setSonarToken(sonar.token);
+        setSonarType(sonar.type);
+        if (sonar.url) {
+          authService.setSonarUrl(sonar.url);
+          setSonarUrl(sonar.url);
+        } else {
+          setSonarUrl(null);
+        }
+      } else {
+        authService.clearSonar();
+        setSonarToken(null);
+        setSonarType(null);
+        setSonarUrl(null);
+      }
+    },
+    [authService],
+  );
+
+  const updateWakaTimeToken = useCallback(
+    (newToken: string | null) => {
+      if (newToken) {
+        authService.setWakaTimeToken(newToken);
+        setWakaTimeToken(newToken);
+      } else {
+        authService.clearWakaTimeToken();
+        setWakaTimeToken(null);
+      }
+    },
+    [authService],
+  );
+
   const isAuthenticated = useMemo(() => token !== null && username !== null && platform !== null, [token, username, platform]);
 
-  return { token, username, sonarToken, sonarType, sonarUrl, wakaTimeToken, platform, isAuthenticated, login, logout };
+  return {
+    token, username, sonarToken, sonarType, sonarUrl, wakaTimeToken, platform,
+    isAuthenticated, login, logout, updateVcsCredentials, updateSonarConfig, updateWakaTimeToken,
+  };
 };
