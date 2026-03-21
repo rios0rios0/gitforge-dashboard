@@ -1,3 +1,4 @@
+import type { ComplianceStatus } from "../../src/domain/entities/compliance_status";
 import type { Repository } from "../../src/domain/entities/repository";
 import type { Release } from "../../src/domain/entities/release";
 import type { Tag } from "../../src/domain/entities/tag";
@@ -28,6 +29,7 @@ export class RepositoryBuilder {
       hasWorkflows: false,
       branches: ["main"],
       sonarMetrics: null,
+      complianceStatus: null,
     };
   }
 
@@ -101,6 +103,11 @@ export class RepositoryBuilder {
 
   asPrivate(): this {
     this.props = { ...this.props, visibility: "PRIVATE" };
+    return this;
+  }
+
+  withComplianceStatus(status: ComplianceStatus): this {
+    this.props = { ...this.props, complianceStatus: status };
     return this;
   }
 

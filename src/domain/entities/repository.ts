@@ -1,3 +1,4 @@
+import type { ComplianceStatus } from "./compliance_status";
 import type { Release } from "./release";
 import type { SonarMetrics } from "./sonar_metrics";
 import type { Tag } from "./tag";
@@ -21,4 +22,5 @@ export interface Repository {
   readonly hasWorkflows: boolean;
   readonly branches: string[];
   readonly sonarMetrics: SonarMetrics | null;
+  readonly complianceStatus: ComplianceStatus | null;
 }

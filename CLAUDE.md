@@ -37,6 +37,9 @@ src/main/             → DI wiring via factories, app entry point
 | File | Purpose |
 |------|---------|
 | `src/domain/entities/dashboard_filter.ts` | Filter/sort logic (pure functions, no side effects) |
+| `src/domain/entities/compliance_status.ts` | Compliance check entity and color computation logic |
+| `src/infrastructure/repositories/github_compliance_repository.ts` | GitHub compliance checks via GraphQL (workflow file + branch protection) |
+| `src/infrastructure/repositories/ado_compliance_repository.ts` | ADO compliance checks via REST (build definitions + policy configurations) |
 | `src/infrastructure/repositories/github_graphql_repository_repository.ts` | Core GraphQL query that bulk-fetches repos + CI + releases + tags |
 | `src/service/mappers/graphql_repository_mapper.ts` | Maps raw GraphQL response to domain entities |
 | `src/presentation/hooks/use_repositories.ts` | Central data fetching hook with loading/error states |

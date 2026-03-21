@@ -62,5 +62,6 @@ export const mapAdoRepoToRepository = (
     hasWorkflows: build !== null,
     branches,
     sonarMetrics: null,
+    complianceStatus: null,
   };
 };
