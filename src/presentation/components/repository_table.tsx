@@ -11,6 +11,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { Repository } from "../../domain/entities/repository";
+import { ComplianceBadge } from "./compliance_badge";
 import { StatusBadge } from "./status_badge";
 
 interface RepositoryTableProps {
@@ -148,6 +149,17 @@ const columns: ColumnDef<Repository>[] = [
       return true;
     },
     meta: { filterType: "select", options: ["all", "passing", "failing", "no-ci"] },
+  },
+  {
+    id: "compliance",
+    accessorFn: (row) => row.complianceStatus?.color ?? "none",
+    header: "Compliance",
+    cell: ({ row }) => <ComplianceBadge status={row.original.complianceStatus} />,
+    meta: { filterType: "select", options: ["", "green", "yellow", "red"] },
+    filterFn: (row, _columnId, filterValue) => {
+      if (!filterValue) return true;
+      return (row.original.complianceStatus?.color ?? "none") === filterValue;
+    },
   },
   {
     accessorKey: "primaryLanguage",

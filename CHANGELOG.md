@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- added Compliance column to repository table with color-coded status (green/yellow/red) based on pipeline existence, build policies, and branch protection
+- added `ComplianceRepository` contract with GitHub GraphQL and Azure DevOps REST implementations
+- added `ComplianceBadge` component with hover tooltip showing individual compliance check results
 - added Settings page with per-integration token management for VCS, Sonar, and WakaTime
 - added individual disconnect for optional integrations (Sonar, WakaTime) without full logout
 - added Web Crypto AES-GCM encryption layer for token storage in `localStorage`

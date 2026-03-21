@@ -9,6 +9,7 @@ import { ContributorsPage } from "../presentation/pages/contributors_page";
 import { LoginPage } from "../presentation/pages/login_page";
 import { SettingsPage } from "../presentation/pages/settings_page";
 import {
+  createComplianceRepository,
   createContributorRepository,
   createRepositoryRepository,
   createSonarRepository,
@@ -56,11 +57,16 @@ const AppContent = ({ authService }: { authService: AuthenticationService }) => 
   const sonarRepo = useMemo(() => createSonarRepository(sonarConfig), [sonarConfig]);
   const wakaTimeRepo = useMemo(() => createWakaTimeRepository(wakaTimeToken ?? undefined), [wakaTimeToken]);
 
-  const dashboardService = useMemo(() => {
+  const complianceRepo = useMemo(() => {
     if (!platform) return null;
+    return createComplianceRepository(platform);
+  }, [platform]);
+
+  const dashboardService = useMemo(() => {
+    if (!platform || !complianceRepo) return null;
     const repoRepo = createRepositoryRepository(platform);
-    return createDashboardService(repoRepo, sonarRepo);
-  }, [platform, sonarRepo]);
+    return createDashboardService(repoRepo, sonarRepo, complianceRepo);
+  }, [platform, sonarRepo, complianceRepo]);
 
   const contributorService = useMemo(() => {
     if (!platform) return null;

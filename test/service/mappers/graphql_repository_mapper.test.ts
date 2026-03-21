@@ -55,6 +55,7 @@ describe("mapGraphQLNodeToRepository", () => {
     expect(result.latestRelease?.tagName).toBe("v1.0.0");
     expect(result.latestTag?.name).toBe("v1.0.0");
     expect(result.hasWorkflows).toBe(true);
+    expect(result.complianceStatus).toBeNull();
   });
 
   it("should set ciStatus to null when defaultBranchRef is null", () => {
