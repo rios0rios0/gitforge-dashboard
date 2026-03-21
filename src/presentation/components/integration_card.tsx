@@ -7,6 +7,7 @@ interface IntegrationCardProps {
   isRequired?: boolean;
   children: (editing: boolean) => ReactNode;
   onSave: () => void;
+  onCancel?: () => void;
   onDisconnect?: () => void;
 }
 
@@ -17,6 +18,7 @@ export const IntegrationCard = ({
   isRequired = false,
   children,
   onSave,
+  onCancel,
   onDisconnect,
 }: IntegrationCardProps) => {
   const [editing, setEditing] = useState(false);
@@ -27,6 +29,7 @@ export const IntegrationCard = ({
   };
 
   const handleCancel = () => {
+    onCancel?.();
     setEditing(false);
   };
 

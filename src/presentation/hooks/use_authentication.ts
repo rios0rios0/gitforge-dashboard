@@ -59,14 +59,16 @@ export const useAuthentication = (authService: AuthenticationService): UseAuthen
       setUsername(newUsername);
       setPlatform(newPlatform);
       if (credentials.sonar) {
+        if (credentials.sonar.url) {
+          authService.setSonarUrl(credentials.sonar.url);
+        } else {
+          authService.clearSonar();
+        }
         authService.setSonarToken(credentials.sonar.token);
         authService.setSonarType(credentials.sonar.type);
         setSonarToken(credentials.sonar.token);
         setSonarType(credentials.sonar.type);
-        if (credentials.sonar.url) {
-          authService.setSonarUrl(credentials.sonar.url);
-          setSonarUrl(credentials.sonar.url);
-        }
+        setSonarUrl(credentials.sonar.url ?? null);
       } else {
         authService.clearSonar();
         setSonarToken(null);
@@ -110,16 +112,16 @@ export const useAuthentication = (authService: AuthenticationService): UseAuthen
   const updateSonarConfig = useCallback(
     (sonar: SonarLoginInfo | null) => {
       if (sonar) {
+        if (sonar.url) {
+          authService.setSonarUrl(sonar.url);
+        } else {
+          authService.clearSonar();
+        }
         authService.setSonarToken(sonar.token);
         authService.setSonarType(sonar.type);
         setSonarToken(sonar.token);
         setSonarType(sonar.type);
-        if (sonar.url) {
-          authService.setSonarUrl(sonar.url);
-          setSonarUrl(sonar.url);
-        } else {
-          setSonarUrl(null);
-        }
+        setSonarUrl(sonar.url ?? null);
       } else {
         authService.clearSonar();
         setSonarToken(null);

@@ -6,6 +6,7 @@ export class EncryptedAuthenticationService implements AuthenticationService {
   private readonly delegate: AuthenticationService;
   private readonly key: CryptoKey;
   private readonly cache = new Map<string, string | null>();
+  private readonly versions = new Map<string, number>();
 
   private constructor(delegate: AuthenticationService, key: CryptoKey) {
     this.delegate = delegate;
@@ -35,9 +36,22 @@ export class EncryptedAuthenticationService implements AuthenticationService {
     }
   }
 
+  private bumpVersion(cacheKey: string): number {
+    const next = (this.versions.get(cacheKey) ?? 0) + 1;
+    this.versions.set(cacheKey, next);
+    return next;
+  }
+
   private setEncrypted(cacheKey: string, plaintext: string, setter: (value: string) => void): void {
+    const version = this.bumpVersion(cacheKey);
     this.cache.set(cacheKey, plaintext);
-    encrypt(this.key, plaintext).then(setter);
+    encrypt(this.key, plaintext)
+      .then((encrypted) => {
+        if (this.versions.get(cacheKey) === version) {
+          setter(encrypted);
+        }
+      })
+      .catch(() => {});
   }
 
   getToken(): string | null {
@@ -49,6 +63,9 @@ export class EncryptedAuthenticationService implements AuthenticationService {
   }
 
   clearToken(): void {
+    this.bumpVersion("token");
+    this.bumpVersion("sonarToken");
+    this.bumpVersion("wakaTimeToken");
     this.cache.set("token", null);
     this.cache.set("sonarToken", null);
     this.cache.set("wakaTimeToken", null);
@@ -72,6 +89,7 @@ export class EncryptedAuthenticationService implements AuthenticationService {
   }
 
   clearSonar(): void {
+    this.bumpVersion("sonarToken");
     this.cache.set("sonarToken", null);
     this.delegate.clearSonar();
   }
@@ -101,6 +119,7 @@ export class EncryptedAuthenticationService implements AuthenticationService {
   }
 
   clearWakaTimeToken(): void {
+    this.bumpVersion("wakaTimeToken");
     this.cache.set("wakaTimeToken", null);
     this.delegate.clearWakaTimeToken();
   }

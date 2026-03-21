@@ -67,14 +67,22 @@ export const SettingsPage = ({
   };
 
   const handleSonarSave = () => {
-    if (localSonarType === "none" || !localSonarToken.trim()) {
+    const trimmedToken = localSonarToken.trim();
+    const trimmedUrl = localSonarUrl.trim();
+
+    if (localSonarType === "none" || !trimmedToken) {
       onUpdateSonar(null);
       return;
     }
+
+    if (localSonarType === "qube" && !trimmedUrl) {
+      return;
+    }
+
     onUpdateSonar({
       type: localSonarType,
-      token: localSonarToken.trim(),
-      url: localSonarType === "qube" ? localSonarUrl.trim() || undefined : undefined,
+      token: trimmedToken,
+      url: localSonarType === "qube" ? trimmedUrl : undefined,
     });
   };
 
@@ -90,9 +98,25 @@ export const SettingsPage = ({
     onUpdateWakaTime(trimmed || null);
   };
 
+  const handleVcsCancel = () => {
+    setVcsToken(token);
+    setVcsUsername(username);
+    setVcsPlatform(platform);
+  };
+
+  const handleSonarCancel = () => {
+    setLocalSonarType(sonarType ?? "none");
+    setLocalSonarToken(sonarToken ?? "");
+    setLocalSonarUrl(sonarUrl ?? "");
+  };
+
   const handleWakaTimeDisconnect = () => {
     onUpdateWakaTime(null);
     setLocalWakaTimeToken("");
+  };
+
+  const handleWakaTimeCancel = () => {
+    setLocalWakaTimeToken(wakaTimeToken ?? "");
   };
 
   const isGitHub = vcsPlatform === "github";
@@ -110,6 +134,7 @@ export const SettingsPage = ({
         status="connected"
         isRequired
         onSave={handleVcsSave}
+        onCancel={handleVcsCancel}
       >
         {(editing) => (
           <>
@@ -129,8 +154,11 @@ export const SettingsPage = ({
               ))}
             </div>
             <div>
-              <label className={labelClass}>{isGitHub ? "GitHub Username" : "Organization Name"}</label>
+              <label htmlFor="vcsUsername" className={labelClass}>
+                {isGitHub ? "GitHub Username" : "Organization Name"}
+              </label>
               <input
+                id="vcsUsername"
                 type="text"
                 value={vcsUsername}
                 onChange={(e) => setVcsUsername(e.target.value)}
@@ -139,8 +167,9 @@ export const SettingsPage = ({
               />
             </div>
             <div>
-              <label className={labelClass}>Personal Access Token</label>
+              <label htmlFor="vcsToken" className={labelClass}>Personal Access Token</label>
               <input
+                id="vcsToken"
                 type="password"
                 value={vcsToken}
                 onChange={(e) => setVcsToken(e.target.value)}
@@ -157,6 +186,7 @@ export const SettingsPage = ({
         description="SonarCloud or SonarQube integration for code quality and security metrics."
         status={sonarToken ? "connected" : "disconnected"}
         onSave={handleSonarSave}
+        onCancel={handleSonarCancel}
         onDisconnect={handleSonarDisconnect}
       >
         {(editing) => (
@@ -180,8 +210,9 @@ export const SettingsPage = ({
               <>
                 {localSonarType === "qube" && (
                   <div>
-                    <label className={labelClass}>SonarQube Instance URL</label>
+                    <label htmlFor="sonarUrl" className={labelClass}>SonarQube Instance URL</label>
                     <input
+                      id="sonarUrl"
                       type="url"
                       value={localSonarUrl}
                       onChange={(e) => setLocalSonarUrl(e.target.value)}
@@ -192,10 +223,11 @@ export const SettingsPage = ({
                   </div>
                 )}
                 <div>
-                  <label className={labelClass}>
+                  <label htmlFor="sonarToken" className={labelClass}>
                     {localSonarType === "cloud" ? "SonarCloud Token" : "SonarQube Token"}
                   </label>
                   <input
+                    id="sonarToken"
                     type="password"
                     value={localSonarToken}
                     onChange={(e) => setLocalSonarToken(e.target.value)}
@@ -215,12 +247,14 @@ export const SettingsPage = ({
         description="Time tracking integration for per-contributor coding time metrics."
         status={wakaTimeToken ? "connected" : "disconnected"}
         onSave={handleWakaTimeSave}
+        onCancel={handleWakaTimeCancel}
         onDisconnect={handleWakaTimeDisconnect}
       >
         {(editing) => (
           <div>
-            <label className={labelClass}>API Key</label>
+            <label htmlFor="wakaTimeToken" className={labelClass}>API Key</label>
             <input
+              id="wakaTimeToken"
               type="password"
               value={localWakaTimeToken}
               onChange={(e) => setLocalWakaTimeToken(e.target.value)}

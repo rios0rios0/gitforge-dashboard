@@ -45,16 +45,14 @@ describe("EncryptedAuthenticationService", () => {
 
     // when
     service.setToken("ghp_test123");
-    // wait for async encryption to complete
-    await new Promise((r) => setTimeout(r, 50));
-    const result = service.getToken();
 
     // then
-    expect(result).toBe("ghp_test123");
-    // verify the delegate stores encrypted value
-    const raw = delegate.getToken();
-    expect(raw).not.toBe("ghp_test123");
-    expect(raw?.startsWith("enc:")).toBe(true);
+    expect(service.getToken()).toBe("ghp_test123");
+    await vi.waitFor(() => {
+      const raw = delegate.getToken();
+      expect(raw).not.toBe("ghp_test123");
+      expect(raw?.startsWith("enc:")).toBe(true);
+    });
   });
 
   it("should return null when no token exists", async () => {
@@ -125,12 +123,12 @@ describe("EncryptedAuthenticationService", () => {
 
     // when
     service.setSonarToken("squ_sonar123");
-    await new Promise((r) => setTimeout(r, 50));
-    const result = service.getSonarToken();
 
     // then
-    expect(result).toBe("squ_sonar123");
-    expect(delegate.getSonarToken()?.startsWith("enc:")).toBe(true);
+    expect(service.getSonarToken()).toBe("squ_sonar123");
+    await vi.waitFor(() => {
+      expect(delegate.getSonarToken()?.startsWith("enc:")).toBe(true);
+    });
   });
 
   it("should encrypt wakatime token on set and decrypt on get", async () => {
@@ -139,12 +137,12 @@ describe("EncryptedAuthenticationService", () => {
 
     // when
     service.setWakaTimeToken("wk_test123");
-    await new Promise((r) => setTimeout(r, 50));
-    const result = service.getWakaTimeToken();
 
     // then
-    expect(result).toBe("wk_test123");
-    expect(delegate.getWakaTimeToken()?.startsWith("enc:")).toBe(true);
+    expect(service.getWakaTimeToken()).toBe("wk_test123");
+    await vi.waitFor(() => {
+      expect(delegate.getWakaTimeToken()?.startsWith("enc:")).toBe(true);
+    });
   });
 
   it("should clear only sonar credentials when clearSonar is called", async () => {
