@@ -9,7 +9,7 @@ query ComplianceCheck($owner: String!, $name: String!, $expression: String!) {
     object(expression: $expression) {
       ... on Blob { byteSize }
     }
-    branchProtectionRules(first: 10) {
+    branchProtectionRules(first: 100) {
       nodes {
         pattern
         requiresStatusChecks
@@ -36,7 +36,8 @@ interface ComplianceQueryResponse {
 const patternMatchesBranch = (pattern: string, branch: string): boolean => {
   if (pattern === branch) return true;
   if (pattern === "*") return true;
-  const regex = new RegExp(`^${pattern.replace(/\*/g, ".*")}$`);
+  const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`^${escaped.replace(/\\\*/g, ".*")}$`);
   return regex.test(branch);
 };
 

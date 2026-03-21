@@ -139,6 +139,22 @@ describe("GitHubComplianceRepository", () => {
     expect(result).toBeNull();
   });
 
+  it("should handle patterns with regex metacharacters safely", async () => {
+    // given
+    mockedGraphql.mockResolvedValueOnce(createResponse({
+      branchProtectionRules: {
+        nodes: [{ pattern: "release/1.0", requiresStatusChecks: true, requiresStrictStatusChecks: true }],
+      },
+    }));
+
+    // when
+    const result = await repository.getComplianceStatus("token", "owner", "repo", "release/1.0");
+
+    // then
+    expect(result!.branchProtection).toBe(true);
+    expect(result!.color).toBe("green");
+  });
+
   it("should return red when no branch protection and no workflow file", async () => {
     // given
     mockedGraphql.mockResolvedValueOnce(createResponse({

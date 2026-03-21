@@ -148,4 +148,30 @@ describe("AdoComplianceRepository", () => {
     // then
     expect(result!.pipelineExists).toBe(true);
   });
+
+  it("should match branch policies with Prefix matchKind", async () => {
+    // given
+    mockedAdoRequest
+      .mockResolvedValueOnce(createDefinitionsResponse(["my-repo"]))
+      .mockResolvedValueOnce({
+        value: [{
+          isEnabled: true,
+          isBlocking: true,
+          type: { id: BUILD_VALIDATION_TYPE_ID },
+          settings: {
+            buildDefinitionId: 1,
+            validDuration: 720,
+            scope: [{ refName: "refs/heads/", matchKind: "Prefix" }],
+          },
+        }],
+      });
+
+    // when
+    const result = await repository.getComplianceStatus("token", "org/project", "my-repo", "main");
+
+    // then
+    expect(result!.branchProtection).toBe(true);
+    expect(result!.buildPolicyOnPRs).toBe(true);
+    expect(result!.color).toBe("green");
+  });
 });

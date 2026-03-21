@@ -48,8 +48,14 @@ export class AdoComplianceRepository implements ComplianceRepository {
       );
 
       const branchRef = `refs/heads/${defaultBranch}`;
+      const scopeMatchesBranch = (scope: { readonly refName: string; readonly matchKind: string }): boolean => {
+        const { refName, matchKind } = scope;
+        if (!matchKind || matchKind === "Exact") return refName === branchRef;
+        if (matchKind === "Prefix") return branchRef.startsWith(refName);
+        return refName === branchRef;
+      };
       const branchPolicies = policies.filter((p) =>
-        p.isEnabled && p.settings.scope.some((s) => s.refName === branchRef),
+        p.isEnabled && p.settings.scope.some(scopeMatchesBranch),
       );
 
       const branchProtection = branchPolicies.length > 0;
