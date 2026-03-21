@@ -28,18 +28,24 @@ export interface UseAuthenticationResult {
   logout: () => void;
 }
 
+const isValidSonarType = (value: string | null): value is SonarType => value === "cloud" || value === "qube";
+
+const isValidPlatform = (value: string | null): value is Platform => value === "github" || value === "azure-devops";
+
 export const useAuthentication = (authService: AuthenticationService): UseAuthenticationResult => {
   const [token, setToken] = useState<string | null>(() => authService.getToken());
   const [username, setUsername] = useState<string | null>(() => authService.getUsername());
   const [sonarToken, setSonarToken] = useState<string | null>(() => authService.getSonarToken());
-  const [sonarType, setSonarType] = useState<SonarType | null>(
-    () => (authService.getSonarType() as SonarType) ?? null,
-  );
+  const [sonarType, setSonarType] = useState<SonarType | null>(() => {
+    const stored = authService.getSonarType();
+    return isValidSonarType(stored) ? stored : null;
+  });
   const [sonarUrl, setSonarUrl] = useState<string | null>(() => authService.getSonarUrl());
   const [wakaTimeToken, setWakaTimeToken] = useState<string | null>(() => authService.getWakaTimeToken());
-  const [platform, setPlatform] = useState<Platform | null>(
-    () => (authService.getPlatform() as Platform) ?? null,
-  );
+  const [platform, setPlatform] = useState<Platform | null>(() => {
+    const stored = authService.getPlatform();
+    return isValidPlatform(stored) ? stored : null;
+  });
 
   const login = useCallback(
     (newToken: string, newUsername: string, credentials: LoginCredentials, newPlatform: Platform) => {
@@ -58,10 +64,18 @@ export const useAuthentication = (authService: AuthenticationService): UseAuthen
           authService.setSonarUrl(credentials.sonar.url);
           setSonarUrl(credentials.sonar.url);
         }
+      } else {
+        authService.clearSonar();
+        setSonarToken(null);
+        setSonarType(null);
+        setSonarUrl(null);
       }
       if (credentials.wakaTimeToken) {
         authService.setWakaTimeToken(credentials.wakaTimeToken);
         setWakaTimeToken(credentials.wakaTimeToken);
+      } else {
+        authService.clearWakaTimeToken();
+        setWakaTimeToken(null);
       }
     },
     [authService],

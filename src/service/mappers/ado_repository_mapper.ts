@@ -55,7 +55,7 @@ export const mapAdoRepoToRepository = (
     isArchived: repo.isDisabled,
     isFork: repo.isFork,
     defaultBranch: repo.defaultBranch?.replace("refs/heads/", "") ?? "main",
-    updatedAt: build?.finishTime ?? new Date().toISOString(),
+    updatedAt: build?.finishTime ?? new Date(0).toISOString(),
     ciStatus,
     latestRelease: null,
     latestTag: mapTag(tagRef),

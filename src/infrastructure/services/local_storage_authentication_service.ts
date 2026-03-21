@@ -49,6 +49,12 @@ export class LocalStorageAuthenticationService implements AuthenticationService 
     this.storage.setItem(SONAR_TOKEN_KEY, token);
   }
 
+  clearSonar(): void {
+    this.storage.removeItem(SONAR_TOKEN_KEY);
+    this.storage.removeItem(SONAR_TYPE_KEY);
+    this.storage.removeItem(SONAR_URL_KEY);
+  }
+
   getSonarType(): string | null {
     return this.storage.getItem(SONAR_TYPE_KEY);
   }
@@ -71,6 +77,10 @@ export class LocalStorageAuthenticationService implements AuthenticationService 
 
   setWakaTimeToken(token: string): void {
     this.storage.setItem(WAKATIME_TOKEN_KEY, token);
+  }
+
+  clearWakaTimeToken(): void {
+    this.storage.removeItem(WAKATIME_TOKEN_KEY);
   }
 
   getPlatform(): string | null {

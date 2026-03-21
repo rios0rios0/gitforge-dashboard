@@ -146,6 +146,7 @@ export const AuthGate = ({ onLogin, error }: AuthGateProps) => {
                     onChange={(e) => setSonarUrl(e.target.value)}
                     placeholder="https://sonarqube.example.com"
                     className={inputClass}
+                    required
                   />
                 </div>
               )}

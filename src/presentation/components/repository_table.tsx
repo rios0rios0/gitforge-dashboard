@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -339,7 +339,7 @@ const LoadingSkeleton = () => (
   <tbody>
     {Array.from({ length: 8 }, (_, i) => (
       <tr key={i} className="animate-pulse">
-        {Array.from({ length: 17 }, (_, j) => (
+        {Array.from({ length: columns.length }, (_, j) => (
           <td key={j} className="px-3 py-3">
             <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-700" />
           </td>
@@ -432,8 +432,8 @@ export const RepositoryTable = ({
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             {table.getHeaderGroups().map((headerGroup) => (
-              <>
-                <tr key={headerGroup.id}>
+              <Fragment key={headerGroup.id}>
+                <tr>
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
@@ -462,7 +462,7 @@ export const RepositoryTable = ({
                     </th>
                   ))}
                 </tr>
-                <tr key={`${headerGroup.id}-filter`} className="border-t border-gray-100 dark:border-gray-700">
+                <tr className="border-t border-gray-100 dark:border-gray-700">
                   {headerGroup.headers.map((header) => (
                     <th key={header.id} className="px-3 py-1.5">
                       {header.column.getCanFilter() ? (
@@ -471,7 +471,7 @@ export const RepositoryTable = ({
                     </th>
                   ))}
                 </tr>
-              </>
+              </Fragment>
             ))}
           </thead>
           {isLoading ? (

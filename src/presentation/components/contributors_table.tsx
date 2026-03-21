@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -312,8 +312,8 @@ export const ContributorsTable = ({
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             {table.getHeaderGroups().map((headerGroup) => (
-              <>
-                <tr key={headerGroup.id}>
+              <Fragment key={headerGroup.id}>
+                <tr>
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
@@ -342,7 +342,7 @@ export const ContributorsTable = ({
                     </th>
                   ))}
                 </tr>
-                <tr key={`${headerGroup.id}-filter`} className="border-t border-gray-100 dark:border-gray-700">
+                <tr className="border-t border-gray-100 dark:border-gray-700">
                   {headerGroup.headers.map((header) => (
                     <th key={header.id} className="px-3 py-1.5">
                       {header.column.getCanFilter() ? (
@@ -351,7 +351,7 @@ export const ContributorsTable = ({
                     </th>
                   ))}
                 </tr>
-              </>
+              </Fragment>
             ))}
           </thead>
           {isLoading ? (
