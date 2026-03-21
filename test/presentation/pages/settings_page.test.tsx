@@ -74,4 +74,140 @@ describe("SettingsPage", () => {
     expect(screen.getAllByText("Disconnect")).toHaveLength(2);
     expect(screen.getAllByText("Edit")).toHaveLength(3);
   });
+
+  it("should call onUpdateVcs with trimmed values when VCS save is clicked", () => {
+    // given
+    const onUpdateVcs = vi.fn();
+    render(<SettingsPage {...defaultProps} onUpdateVcs={onUpdateVcs} />);
+
+    // enter edit mode for VCS card
+    fireEvent.click(screen.getAllByText("Edit")[0]);
+
+    fireEvent.change(screen.getByLabelText("GitHub Username"), {
+      target: { value: "  newuser  " },
+    });
+    fireEvent.change(screen.getByLabelText("Personal Access Token"), {
+      target: { value: "  newtoken  " },
+    });
+
+    // when
+    fireEvent.click(screen.getByText("Save"));
+
+    // then
+    expect(onUpdateVcs).toHaveBeenCalledWith("newtoken", "newuser", "github");
+  });
+
+  it("should call onUpdateSonar with sonar info when Sonar save is clicked", () => {
+    // given
+    const onUpdateSonar = vi.fn();
+    render(<SettingsPage {...defaultProps} onUpdateSonar={onUpdateSonar} />);
+
+    // enter edit mode for Sonar card (second Edit button)
+    fireEvent.click(screen.getAllByText("Edit")[1]);
+
+    // when
+    fireEvent.click(screen.getByText("Save"));
+
+    // then
+    expect(onUpdateSonar).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "cloud", token: "squ_sonar123" }),
+    );
+  });
+
+  it("should call onUpdateWakaTime with token when WakaTime save is clicked", () => {
+    // given
+    const onUpdateWakaTime = vi.fn();
+    render(<SettingsPage {...defaultProps} onUpdateWakaTime={onUpdateWakaTime} />);
+
+    // enter edit mode for WakaTime card (third Edit button)
+    fireEvent.click(screen.getAllByText("Edit")[2]);
+
+    // when
+    fireEvent.click(screen.getByText("Save"));
+
+    // then
+    expect(onUpdateWakaTime).toHaveBeenCalledWith("wk_test123");
+  });
+
+  it("should reset VCS fields when cancel is clicked", () => {
+    // given
+    render(<SettingsPage {...defaultProps} />);
+    fireEvent.click(screen.getAllByText("Edit")[0]);
+
+    fireEvent.change(screen.getByLabelText("GitHub Username"), {
+      target: { value: "changed" },
+    });
+
+    // when
+    fireEvent.click(screen.getByText("Cancel"));
+
+    // then
+    fireEvent.click(screen.getAllByText("Edit")[0]);
+    expect(screen.getByLabelText("GitHub Username")).toHaveValue("testuser");
+  });
+
+  it("should render Azure DevOps label when platform is azure-devops", () => {
+    // given
+    const props = { ...defaultProps, platform: "azure-devops" as const };
+
+    // when
+    render(<SettingsPage {...props} />);
+
+    // then
+    expect(screen.getByRole("heading", { name: "Azure DevOps" })).toBeInTheDocument();
+  });
+
+  it("should show SonarQube URL field when sonarType is qube", () => {
+    // given
+    const props = {
+      ...defaultProps,
+      sonarType: "qube" as const,
+      sonarUrl: "https://sonar.local",
+    };
+
+    // when
+    render(<SettingsPage {...props} />);
+
+    // then
+    fireEvent.click(screen.getAllByText("Edit")[1]);
+    expect(screen.getByLabelText("SonarQube Instance URL")).toBeInTheDocument();
+  });
+
+  it("should call onUpdateSonar with null when sonar type is set to none and saved", () => {
+    // given
+    const onUpdateSonar = vi.fn();
+    render(<SettingsPage {...defaultProps} onUpdateSonar={onUpdateSonar} />);
+
+    // enter edit mode
+    fireEvent.click(screen.getAllByText("Edit")[1]);
+
+    // set to None
+    fireEvent.click(screen.getByText("None"));
+
+    // when
+    fireEvent.click(screen.getByText("Save"));
+
+    // then
+    expect(onUpdateSonar).toHaveBeenCalledWith(null);
+  });
+
+  it("should call onUpdateWakaTime with null when empty and saved", () => {
+    // given
+    const onUpdateWakaTime = vi.fn();
+    render(<SettingsPage {...defaultProps} onUpdateWakaTime={onUpdateWakaTime} />);
+
+    // enter edit mode
+    fireEvent.click(screen.getAllByText("Edit")[2]);
+
+    // clear token
+    fireEvent.change(screen.getByLabelText("API Key"), {
+      target: { value: "" },
+    });
+
+    // when
+    fireEvent.click(screen.getByText("Save"));
+
+    // then
+    expect(onUpdateWakaTime).toHaveBeenCalledWith(null);
+  });
 });

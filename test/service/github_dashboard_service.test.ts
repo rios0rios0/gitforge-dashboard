@@ -33,4 +33,49 @@ describe("GitHubDashboardService", () => {
     // when / then
     await expect(service.listRepositories("token", "user")).rejects.toThrow("API failure");
   });
+
+  it("should enrich repositories with sonar metrics when project keys match", async () => {
+    // given
+    const repos = [
+      RepositoryBuilder.create().withName("my-app").build(),
+      RepositoryBuilder.create().withName("other").build(),
+    ];
+    const repository = new StubRepositoryRepository().withRepositories(repos);
+    const sonarMetrics = {
+      bugs: 1,
+      codeSmells: 2,
+      securityHotspots: 0,
+      vulnerabilities: 0,
+      coverage: 80,
+      duplications: 3,
+      technicalDebt: "1h",
+      qualityGateStatus: "OK" as const,
+    };
+    const sonarRepo = new StubSonarRepository()
+      .withProjectKeys(["org_my-app"])
+      .withProjectMetrics("org_my-app", sonarMetrics);
+    const service = new GitHubDashboardService(repository, sonarRepo);
+
+    // when
+    const result = await service.listRepositories("token", "user");
+
+    // then
+    expect(result[0].sonarMetrics).toEqual(sonarMetrics);
+    expect(result[1].sonarMetrics).toBeNull();
+  });
+
+  it("should return repos unchanged when no project keys match any repo", async () => {
+    // given
+    const repos = [RepositoryBuilder.create().withName("my-app").build()];
+    const repository = new StubRepositoryRepository().withRepositories(repos);
+    const sonarRepo = new StubSonarRepository()
+      .withProjectKeys(["completely-unrelated-project"]);
+    const service = new GitHubDashboardService(repository, sonarRepo);
+
+    // when
+    const result = await service.listRepositories("token", "user");
+
+    // then
+    expect(result[0].sonarMetrics).toBeNull();
+  });
 });
