@@ -25,8 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added mapper tests for ADO repository and contributor mappers
 - added comprehensive test suite (23 new test files, 3 test doubles) covering infrastructure repositories, HTTP clients, hooks, components, pages, and factories
 - added V8 coverage thresholds in `vite.config.ts` enforcing 80%+ statements/functions/lines and 75%+ branches
+- added JUnit test reporter and coverage PR comment via shared pipeline integration
+- added optional SonarQube job to shared GitHub Actions JavaScript pipeline
 
 ### Changed
+
+- changed coverage thresholds from 80/80/75/80 to 90/90/77/90 (lines/functions/branches/statements) in `vite.config.ts`
 
 - changed DI wiring to create repositories and services dynamically based on selected platform
 - changed approved PR counting to use only APPROVED review state instead of merged state fallback

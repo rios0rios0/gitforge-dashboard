@@ -14,10 +14,14 @@ permissions:
   contents: 'write'
   pages: 'write'
   id-token: 'write'
+  pull-requests: 'write'
+  checks: 'write'
 
 jobs:
   ci:
     uses: 'rios0rios0/pipelines/.github/workflows/javascript.yaml@main'
+    secrets:
+      sonar_token: ${{ secrets.SONAR_TOKEN }}
 
   deploy:
     runs-on: 'ubuntu-latest'
