@@ -11,10 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - added contributors metrics dashboard with SonarCloud integration and proportional metric distribution
 - added optional SonarCloud token prompt on the login page with skip support
+- added Azure DevOps support via Adapter Design Pattern (repositories, CI status, tags, contributors)
+- added platform selector on the login page (GitHub or Azure DevOps)
+- added ADO REST API client and repository/contributor implementations with batched parallel fetching
 - added service-layer tests for `GitHubContributorService` covering aggregation, distribution, and error scenarios
+- added mapper tests for ADO repository and contributor mappers
 
 ### Changed
 
+- changed DI wiring to create repositories and services dynamically based on selected platform
 - changed approved PR counting to use only APPROVED review state instead of merged state fallback
 - changed sortable table headers to use `<button>` with `aria-sort` for keyboard and screen-reader accessibility
 

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useAuthentication } from "../presentation/hooks/use_authentication";
 import { useAutoRefresh } from "../presentation/hooks/use_auto_refresh";
+import { useTheme } from "../presentation/hooks/use_theme";
 import { Navigation, type ActivePage } from "../presentation/components/navigation";
 import { DashboardPage } from "../presentation/pages/dashboard_page";
 import { ContributorsPage } from "../presentation/pages/contributors_page";
@@ -8,31 +9,45 @@ import { LoginPage } from "../presentation/pages/login_page";
 import {
   createContributorRepository,
   createRepositoryRepository,
-  createSonarCloudRepository,
+  createSonarRepository,
+  createWakaTimeRepository,
 } from "./factories/repository_factory";
 import {
   createAuthenticationService,
   createContributorService,
   createDashboardService,
 } from "./factories/service_factory";
+import type { SonarConfig } from "../infrastructure/repositories/sonar_repository_impl";
 
 const authService = createAuthenticationService();
-const repositoryRepository = createRepositoryRepository();
-const contributorRepository = createContributorRepository();
-const dashboardService = createDashboardService(repositoryRepository);
 
 export const App = () => {
-  const { token, username, sonarToken, isAuthenticated, login, logout } =
+  const { token, username, sonarToken, sonarType, sonarUrl, wakaTimeToken, platform, isAuthenticated, login, logout } =
     useAuthentication(authService);
 
-  const contributorService = useMemo(
-    () =>
-      createContributorService(
-        contributorRepository,
-        createSonarCloudRepository(sonarToken ?? undefined),
-      ),
-    [sonarToken],
-  );
+  const sonarConfig = useMemo((): SonarConfig | undefined => {
+    if (!sonarToken || !sonarType) return undefined;
+    if (sonarType === "cloud") {
+      return { type: "cloud", token: sonarToken, baseUrl: "https://sonarcloud.io", organization: username ?? undefined };
+    }
+    return { type: "qube", token: sonarToken, baseUrl: sonarUrl ?? "" };
+  }, [sonarToken, sonarType, sonarUrl, username]);
+
+  const sonarRepo = useMemo(() => createSonarRepository(sonarConfig), [sonarConfig]);
+  const wakaTimeRepo = useMemo(() => createWakaTimeRepository(wakaTimeToken ?? undefined), [wakaTimeToken]);
+
+  const dashboardService = useMemo(() => {
+    if (!platform) return null;
+    const repoRepo = createRepositoryRepository(platform);
+    return createDashboardService(repoRepo, sonarRepo);
+  }, [platform, sonarRepo]);
+
+  const contributorService = useMemo(() => {
+    if (!platform) return null;
+    const contribRepo = createContributorRepository(platform);
+    return createContributorService(contribRepo, sonarRepo, wakaTimeRepo);
+  }, [platform, sonarRepo, wakaTimeRepo]);
+
   const [activePage, setActivePage] = useState<ActivePage>("dashboard");
   const [lastFetchedAt, setLastFetchedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,13 +68,14 @@ export const App = () => {
   }, []);
 
   const { interval, setInterval } = useAutoRefresh(handleRefresh);
+  const { theme, toggleTheme } = useTheme();
 
-  if (!isAuthenticated || !token || !username) {
+  if (!isAuthenticated || !token || !username || !platform || !dashboardService || !contributorService) {
     return <LoginPage onLogin={login} error={null} />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
       <div className="mx-auto max-w-7xl px-4 py-6">
         <Navigation
           activePage={activePage}
@@ -67,9 +83,11 @@ export const App = () => {
           lastFetchedAt={lastFetchedAt}
           refreshInterval={interval}
           isLoading={isLoading}
+          theme={theme}
           onPageChange={setActivePage}
           onRefresh={handleRefresh}
           onIntervalChange={setInterval}
+          onToggleTheme={toggleTheme}
           onLogout={logout}
         />
 

@@ -68,11 +68,12 @@ describe("LocalStorageAuthenticationService", () => {
     expect(result).toBe("testuser");
   });
 
-  it("should clear token, username, and sonar token when clearToken is called", () => {
+  it("should clear all credentials when clearToken is called", () => {
     // given
     service.setToken("ghp_test123");
     service.setUsername("testuser");
     service.setSonarToken("squ_sonar123");
+    service.setPlatform("github");
 
     // when
     service.clearToken();
@@ -81,6 +82,7 @@ describe("LocalStorageAuthenticationService", () => {
     expect(service.getToken()).toBeNull();
     expect(service.getUsername()).toBeNull();
     expect(service.getSonarToken()).toBeNull();
+    expect(service.getPlatform()).toBeNull();
   });
 
   it("should return sonar token when sonar token was previously set", () => {
@@ -97,6 +99,25 @@ describe("LocalStorageAuthenticationService", () => {
   it("should return null when no sonar token exists", () => {
     // when
     const result = service.getSonarToken();
+
+    // then
+    expect(result).toBeNull();
+  });
+
+  it("should return platform when platform was previously set", () => {
+    // given
+    service.setPlatform("azure-devops");
+
+    // when
+    const result = service.getPlatform();
+
+    // then
+    expect(result).toBe("azure-devops");
+  });
+
+  it("should return null when no platform exists", () => {
+    // when
+    const result = service.getPlatform();
 
     // then
     expect(result).toBeNull();

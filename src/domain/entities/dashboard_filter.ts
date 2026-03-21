@@ -2,7 +2,7 @@ import type { Repository } from "./repository";
 
 export type CIFilter = "all" | "passing" | "failing" | "no-ci";
 export type ReleaseFilter = "all" | "has-release" | "no-release";
-export type SortField = "name" | "updatedAt" | "ciStatus" | "releaseDate";
+export type SortField = "name" | "updatedAt" | "ciStatus" | "releaseDate" | "language" | "latestTag" | "visibility";
 export type SortDirection = "asc" | "desc";
 
 export interface DashboardFilter {
@@ -87,6 +87,12 @@ export const sortRepositories = (
         const dateB = b.latestRelease?.publishedAt ?? "";
         return dateB.localeCompare(dateA);
       }
+      case "language":
+        return (a.primaryLanguage ?? "").localeCompare(b.primaryLanguage ?? "");
+      case "latestTag":
+        return (a.latestTag?.name ?? "").localeCompare(b.latestTag?.name ?? "");
+      case "visibility":
+        return a.visibility.localeCompare(b.visibility);
     }
   });
   return direction === "desc" ? sorted.reverse() : sorted;

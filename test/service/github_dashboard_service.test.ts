@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { GitHubDashboardService } from "../../src/service/github_dashboard_service";
 import { RepositoryBuilder } from "../builders/repository_builder";
 import { StubRepositoryRepository } from "../doubles/stub_repository_repository";
+import { StubSonarRepository } from "../doubles/stub_sonar_repository";
 
 describe("GitHubDashboardService", () => {
   it("should return all repositories when listRepositories is called", async () => {
@@ -11,7 +12,8 @@ describe("GitHubDashboardService", () => {
       RepositoryBuilder.create().withName("repo-b").build(),
     ];
     const repository = new StubRepositoryRepository().withRepositories(repos);
-    const service = new GitHubDashboardService(repository);
+    const sonarRepo = new StubSonarRepository();
+    const service = new GitHubDashboardService(repository, sonarRepo);
 
     // when
     const result = await service.listRepositories("token", "user");
@@ -25,7 +27,8 @@ describe("GitHubDashboardService", () => {
   it("should propagate error when repository fetch fails", async () => {
     // given
     const repository = new StubRepositoryRepository().withError(new Error("API failure"));
-    const service = new GitHubDashboardService(repository);
+    const sonarRepo = new StubSonarRepository();
+    const service = new GitHubDashboardService(repository, sonarRepo);
 
     // when / then
     await expect(service.listRepositories("token", "user")).rejects.toThrow("API failure");

@@ -32,6 +32,9 @@ const createNode = (overrides: Partial<GraphQLRepositoryNode> = {}): GraphQLRepo
   refs: {
     nodes: [{ name: "v1.0.0", target: { oid: "def456" } }],
   },
+  branchRefs: {
+    nodes: [{ name: "main" }, { name: "develop" }],
+  },
   ...overrides,
 });
 

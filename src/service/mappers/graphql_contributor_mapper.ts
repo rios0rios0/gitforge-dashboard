@@ -90,7 +90,8 @@ export const mapPullRequestsToContributors = (
           : 0,
       totalPipelineRuns: acc.totalPipelineRuns,
       successfulPipelineRuns: acc.successfulPipelineRuns,
-      sonarCloudMetrics: null,
+      sonarMetrics: null,
+      wakaTimeMetrics: null,
     }),
   );
 };

@@ -1,13 +1,14 @@
 import type { Contributor } from "../domain/entities/contributor";
-import type { SonarCloudMetrics } from "../domain/entities/sonar_cloud_metrics";
+import type { SonarMetrics } from "../domain/entities/sonar_metrics";
 import type { ContributorRepository } from "../domain/repositories/contributor_repository";
-import type { SonarCloudRepository } from "../domain/repositories/sonar_cloud_repository";
+import type { AuthorIssues, SonarRepository } from "../domain/repositories/sonar_repository";
+import type { WakaTimeRepository } from "../domain/repositories/wakatime_repository";
 import type { ContributorService } from "../domain/services/contributor_service";
 
 const aggregateProjectMetrics = (
-  metricsArray: (SonarCloudMetrics | null)[],
-): SonarCloudMetrics | null => {
-  const valid = metricsArray.filter((m): m is SonarCloudMetrics => m !== null);
+  metricsArray: (SonarMetrics | null)[],
+): SonarMetrics | null => {
+  const valid = metricsArray.filter((m): m is SonarMetrics => m !== null);
   if (valid.length === 0) return null;
 
   return {
@@ -15,27 +16,19 @@ const aggregateProjectMetrics = (
     codeSmells: valid.reduce((sum, m) => sum + m.codeSmells, 0),
     securityHotspots: valid.reduce((sum, m) => sum + m.securityHotspots, 0),
     vulnerabilities: valid.reduce((sum, m) => sum + m.vulnerabilities, 0),
-    coverage:
-      valid.reduce((sum, m) => sum + m.coverage, 0) / valid.length,
-    duplications:
-      valid.reduce((sum, m) => sum + m.duplications, 0) / valid.length,
+    coverage: valid.reduce((sum, m) => sum + m.coverage, 0) / valid.length,
+    duplications: valid.reduce((sum, m) => sum + m.duplications, 0) / valid.length,
     technicalDebt: formatTotalDebt(valid),
+    qualityGateStatus: "NONE",
   };
 };
 
-const formatTotalDebt = (metrics: SonarCloudMetrics[]): string => {
+const formatTotalDebt = (metrics: SonarMetrics[]): string => {
   let totalMinutes = 0;
   for (const m of metrics) {
     totalMinutes += parseDebtToMinutes(m.technicalDebt);
   }
-  const days = Math.floor(totalMinutes / (8 * 60));
-  const hours = Math.floor((totalMinutes % (8 * 60)) / 60);
-  const mins = totalMinutes % 60;
-  const parts: string[] = [];
-  if (days > 0) parts.push(`${days}d`);
-  if (hours > 0) parts.push(`${hours}h`);
-  parts.push(`${mins}min`);
-  return parts.join(" ");
+  return formatMinutesToDebt(totalMinutes);
 };
 
 const parseDebtToMinutes = (debt: string): number => {
@@ -49,16 +42,61 @@ const parseDebtToMinutes = (debt: string): number => {
   return minutes;
 };
 
+const formatMinutesToDebt = (totalMinutes: number): string => {
+  const days = Math.floor(totalMinutes / (8 * 60));
+  const hours = Math.floor((totalMinutes % (8 * 60)) / 60);
+  const mins = totalMinutes % 60;
+  const parts: string[] = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  parts.push(`${mins}min`);
+  return parts.join(" ");
+};
+
+const mergeAuthorIssues = (
+  allIssues: Map<string, AuthorIssues>[],
+): Map<string, AuthorIssues> => {
+  const merged = new Map<string, AuthorIssues>();
+  for (const projectIssues of allIssues) {
+    for (const [author, issues] of projectIssues) {
+      const existing = merged.get(author);
+      if (existing) {
+        existing.bugs += issues.bugs;
+        existing.codeSmells += issues.codeSmells;
+        existing.vulnerabilities += issues.vulnerabilities;
+        existing.securityHotspots += issues.securityHotspots;
+      } else {
+        merged.set(author, { ...issues });
+      }
+    }
+  }
+  return merged;
+};
+
+const matchContributorToAuthor = (
+  contributorName: string,
+  authorKeys: string[],
+): string | null => {
+  const lower = contributorName.toLowerCase();
+  return authorKeys.find((author) => {
+    const authorLower = author.toLowerCase();
+    return authorLower.includes(lower) || lower.includes(authorLower);
+  }) ?? null;
+};
+
 export class GitHubContributorService implements ContributorService {
   private readonly contributorRepository: ContributorRepository;
-  private readonly sonarCloudRepository: SonarCloudRepository;
+  private readonly sonarRepository: SonarRepository;
+  private readonly wakaTimeRepository: WakaTimeRepository;
 
   constructor(
     contributorRepository: ContributorRepository,
-    sonarCloudRepository: SonarCloudRepository,
+    sonarRepository: SonarRepository,
+    wakaTimeRepository: WakaTimeRepository,
   ) {
     this.contributorRepository = contributorRepository;
-    this.sonarCloudRepository = sonarCloudRepository;
+    this.sonarRepository = sonarRepository;
+    this.wakaTimeRepository = wakaTimeRepository;
   }
 
   async listContributors(
@@ -74,48 +112,61 @@ export class GitHubContributorService implements ContributorService {
       dateTo,
     );
 
-    // Try to fetch SonarCloud metrics
-    const projectKeys = await this.sonarCloudRepository.listProjectKeys(username);
-    if (projectKeys.length === 0) return contributors;
+    // Fetch WakaTime summaries
+    const wakaTimeSummaries = await this.wakaTimeRepository.getMemberSummaries(username);
+    const wakaTimeKeys = [...wakaTimeSummaries.keys()];
 
-    const projectMetrics = await Promise.all(
-      projectKeys.map((key) => this.sonarCloudRepository.getProjectMetrics(key)),
+    const projectKeys = await this.sonarRepository.listProjectKeys();
+    if (projectKeys.length === 0) {
+      // No Sonar, but maybe WakaTime
+      if (wakaTimeSummaries.size === 0) return contributors;
+      return contributors.map((c) => {
+        const matchedWaka = matchContributorToAuthor(c.username, wakaTimeKeys);
+        return { ...c, wakaTimeMetrics: matchedWaka ? wakaTimeSummaries.get(matchedWaka) ?? null : null };
+      });
+    }
+
+    // Fetch per-author issues from all projects
+    const allIssues = await Promise.all(
+      projectKeys.map((key) => this.sonarRepository.getIssuesByAuthor(key)),
     );
+    const authorIssues = mergeAuthorIssues(allIssues);
 
+    // Fetch aggregate project metrics for coverage/duplications/debt
+    const projectMetrics = await Promise.all(
+      projectKeys.map((key) => this.sonarRepository.getProjectMetrics(key)),
+    );
     const aggregated = aggregateProjectMetrics(projectMetrics);
-    if (!aggregated) return contributors;
-
-    // Distribute SonarCloud metrics proportionally by lines of code
     const totalLines = contributors.reduce((sum, c) => sum + c.linesOfCode, 0);
-    if (totalLines === 0) return contributors;
+
+    const authorKeys = [...authorIssues.keys()];
 
     return contributors.map((c) => {
-      const ratio = c.linesOfCode / totalLines;
+      const matchedAuthor = matchContributorToAuthor(c.username, authorKeys);
+      const issues = matchedAuthor ? authorIssues.get(matchedAuthor) : null;
+
+      if (!issues && !aggregated) return c;
+
+      const ratio = totalLines > 0 ? c.linesOfCode / totalLines : 0;
+
+      const matchedWaka = matchContributorToAuthor(c.username, wakaTimeKeys);
+
       return {
         ...c,
-        sonarCloudMetrics: {
-          bugs: Math.round(aggregated.bugs * ratio),
-          codeSmells: Math.round(aggregated.codeSmells * ratio),
-          securityHotspots: Math.round(aggregated.securityHotspots * ratio),
-          vulnerabilities: Math.round(aggregated.vulnerabilities * ratio),
-          coverage: Math.round(aggregated.coverage * 10) / 10,
-          duplications: Math.round(aggregated.duplications * 10) / 10,
-          technicalDebt: formatProportionalDebt(aggregated.technicalDebt, ratio),
+        sonarMetrics: {
+          bugs: issues?.bugs ?? 0,
+          codeSmells: issues?.codeSmells ?? 0,
+          securityHotspots: issues?.securityHotspots ?? 0,
+          vulnerabilities: issues?.vulnerabilities ?? 0,
+          coverage: aggregated ? Math.round(aggregated.coverage * 10) / 10 : 0,
+          duplications: aggregated ? Math.round(aggregated.duplications * 10) / 10 : 0,
+          technicalDebt: aggregated
+            ? formatMinutesToDebt(Math.round(parseDebtToMinutes(aggregated.technicalDebt) * ratio))
+            : "0min",
+          qualityGateStatus: "NONE",
         },
+        wakaTimeMetrics: matchedWaka ? wakaTimeSummaries.get(matchedWaka) ?? null : null,
       };
     });
   }
 }
-
-const formatProportionalDebt = (totalDebt: string, ratio: number): string => {
-  const totalMinutes = parseDebtToMinutes(totalDebt);
-  const proportional = Math.round(totalMinutes * ratio);
-  const days = Math.floor(proportional / (8 * 60));
-  const hours = Math.floor((proportional % (8 * 60)) / 60);
-  const mins = proportional % 60;
-  const parts: string[] = [];
-  if (days > 0) parts.push(`${days}d`);
-  if (hours > 0) parts.push(`${hours}h`);
-  parts.push(`${mins}min`);
-  return parts.join(" ");
-};

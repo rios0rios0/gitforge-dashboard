@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import type { DashboardService } from "../../domain/services/dashboard_service";
-import { FilterBar } from "../components/filter_bar";
-import { RepositoryGrid } from "../components/repository_grid";
-import { useFilters } from "../hooks/use_filters";
+import { RepositoryTable } from "../components/repository_table";
 import { useRepositories } from "../hooks/use_repositories";
 
 interface DashboardPageProps {
@@ -23,8 +21,6 @@ export const DashboardPage = ({
     token,
     username,
   );
-  const { filter, filteredRepositories, languages, updateFilter, resetFilters } =
-    useFilters(repositories);
 
   useEffect(() => {
     onRefetchRef?.(refetch);
@@ -33,18 +29,11 @@ export const DashboardPage = ({
   return (
     <div>
       {error && (
-        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
+        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-400">{error}</div>
       )}
 
-      <FilterBar
-        filter={filter}
-        languages={languages}
-        onFilterChange={updateFilter}
-        onReset={resetFilters}
-      />
-
-      <RepositoryGrid
-        repositories={filteredRepositories}
+      <RepositoryTable
+        repositories={repositories}
         totalCount={repositories.length}
         isLoading={isLoading}
       />
