@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added ADO REST API client and repository/contributor implementations with batched parallel fetching
 - added service-layer tests for `GitHubContributorService` covering aggregation, distribution, and error scenarios
 - added mapper tests for ADO repository and contributor mappers
+- added comprehensive test suite (23 new test files, 3 test doubles) covering infrastructure repositories, HTTP clients, hooks, components, pages, and factories
+- added V8 coverage thresholds in `vite.config.ts` enforcing 80%+ statements/functions/lines and 75%+ branches
 
 ### Changed
 
