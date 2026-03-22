@@ -78,4 +78,17 @@ describe("BadgeStatusCell", () => {
     // then
     expect(screen.queryByText("Latest Release")).not.toBeInTheDocument();
   });
+
+  it("should close popup when Escape key is pressed", () => {
+    // given
+    render(<BadgeStatusCell status={greenStatus} />);
+    fireEvent.click(screen.getByText("Complete"));
+    expect(screen.getByText("Latest Release")).toBeInTheDocument();
+
+    // when
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    // then
+    expect(screen.queryByText("Latest Release")).not.toBeInTheDocument();
+  });
 });
