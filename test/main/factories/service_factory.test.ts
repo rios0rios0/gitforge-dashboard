@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createDashboardService, createContributorService } from "../../../src/main/factories/service_factory";
 import { GitHubDashboardService } from "../../../src/service/github_dashboard_service";
 import { GitHubContributorService } from "../../../src/service/github_contributor_service";
+import { StubBadgeRepository } from "../../doubles/stub_badge_repository";
 import { StubComplianceRepository } from "../../doubles/stub_compliance_repository";
 import { StubRepositoryRepository } from "../../doubles/stub_repository_repository";
 import { StubContributorRepository } from "../../doubles/stub_contributor_repository";
@@ -14,9 +15,10 @@ describe("service_factory", () => {
     const repoRepo = new StubRepositoryRepository();
     const sonarRepo = new StubSonarRepository();
     const complianceRepo = new StubComplianceRepository();
+    const badgeRepo = new StubBadgeRepository();
 
     // when
-    const service = createDashboardService(repoRepo, sonarRepo, complianceRepo);
+    const service = createDashboardService(repoRepo, sonarRepo, complianceRepo, badgeRepo);
 
     // then
     expect(service).toBeInstanceOf(GitHubDashboardService);

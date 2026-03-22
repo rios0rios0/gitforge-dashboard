@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- added Badges column to repository table that checks each repo's `README.md` for required shields.io badges (Release, License, Build Status, SonarCloud Coverage, SonarCloud Quality Gate, OpenSSF Best Practices) with green/yellow status and click-to-popup details
 - added Compliance column to repository table with color-coded status (green/yellow/red) based on pipeline existence, build policies, and branch protection
 - added `ComplianceRepository` contract with GitHub GraphQL and Azure DevOps REST implementations
 - added `ComplianceBadge` component with hover tooltip showing individual compliance check results
@@ -30,8 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- changed CI workflow to use the new `yarn.yaml` reusable workflow from `rios0rios0/pipelines` (replacing deprecated `javascript.yaml`)
+- changed CI workflow to follow the standard `default.yaml` pattern with named workflow, permission comments, and `default` job name
 - changed coverage thresholds from 80/80/75/80 to 90/90/77/90 (lines/functions/branches/statements) in `vite.config.ts`
-
 - changed DI wiring to create repositories and services dynamically based on selected platform
 - changed approved PR counting to use only APPROVED review state instead of merged state fallback
 - changed sortable table headers to use `<button>` with `aria-sort` for keyboard and screen-reader accessibility

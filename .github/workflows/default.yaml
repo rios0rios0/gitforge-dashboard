@@ -1,3 +1,5 @@
+name: 'default'
+
 on:
   push:
     branches:
@@ -10,22 +12,22 @@ on:
   workflow_dispatch:
 
 permissions:
-  security-events: 'write'
-  contents: 'write'
-  pages: 'write'
-  id-token: 'write'
-  pull-requests: 'write'
-  checks: 'write'
+  security-events: 'write' # security-sast_codeql
+  contents: 'write' # delivery-release
+  pull-requests: 'write' # tests-test_all (coverage report comment)
+  checks: 'write' # tests-test_all (test results annotations)
+  pages: 'write' # deploy (GitHub Pages)
+  id-token: 'write' # deploy (GitHub Pages OIDC)
 
 jobs:
-  ci:
-    uses: 'rios0rios0/pipelines/.github/workflows/javascript.yaml@main'
+  default:
+    uses: 'rios0rios0/pipelines/.github/workflows/yarn.yaml@main'
     secrets:
       sonar_token: ${{ secrets.SONAR_TOKEN }}
 
   deploy:
     runs-on: 'ubuntu-latest'
-    needs: ['ci']
+    needs: ['default']
     if: "github.event_name == 'push' && github.ref == 'refs/heads/main'"
     environment:
       name: 'github-pages'

@@ -63,5 +63,6 @@ export const mapAdoRepoToRepository = (
     branches,
     sonarMetrics: null,
     complianceStatus: null,
+    badgeStatus: null,
   };
 };

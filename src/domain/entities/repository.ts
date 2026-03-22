@@ -1,3 +1,4 @@
+import type { BadgeStatus } from "./badge_status";
 import type { ComplianceStatus } from "./compliance_status";
 import type { Release } from "./release";
 import type { SonarMetrics } from "./sonar_metrics";
@@ -23,4 +24,5 @@ export interface Repository {
   readonly branches: string[];
   readonly sonarMetrics: SonarMetrics | null;
   readonly complianceStatus: ComplianceStatus | null;
+  readonly badgeStatus: BadgeStatus | null;
 }

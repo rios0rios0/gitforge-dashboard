@@ -1,14 +1,17 @@
 import { describe, it, expect } from "vitest";
 import {
+  createBadgeRepository,
   createComplianceRepository,
   createRepositoryRepository,
   createContributorRepository,
   createSonarRepository,
   createWakaTimeRepository,
 } from "../../../src/main/factories/repository_factory";
+import { AdoBadgeRepository } from "../../../src/infrastructure/repositories/ado_badge_repository";
 import { AdoComplianceRepository } from "../../../src/infrastructure/repositories/ado_compliance_repository";
 import { AdoRestRepositoryRepository } from "../../../src/infrastructure/repositories/ado_rest_repository_repository";
 import { AdoRestContributorRepository } from "../../../src/infrastructure/repositories/ado_rest_contributor_repository";
+import { GitHubBadgeRepository } from "../../../src/infrastructure/repositories/github_badge_repository";
 import { GitHubComplianceRepository } from "../../../src/infrastructure/repositories/github_compliance_repository";
 import { GitHubGraphQLRepositoryRepository } from "../../../src/infrastructure/repositories/github_graphql_repository_repository";
 import { GitHubGraphQLContributorRepository } from "../../../src/infrastructure/repositories/github_graphql_contributor_repository";
@@ -106,6 +109,24 @@ describe("repository_factory", () => {
 
       // then
       expect(repo).toBeInstanceOf(AdoComplianceRepository);
+    });
+  });
+
+  describe("createBadgeRepository", () => {
+    it("should return GitHubBadgeRepository for github", () => {
+      // given / when
+      const repo = createBadgeRepository("github");
+
+      // then
+      expect(repo).toBeInstanceOf(GitHubBadgeRepository);
+    });
+
+    it("should return AdoBadgeRepository for azure-devops", () => {
+      // given / when
+      const repo = createBadgeRepository("azure-devops");
+
+      // then
+      expect(repo).toBeInstanceOf(AdoBadgeRepository);
     });
   });
 });
