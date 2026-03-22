@@ -1,0 +1,82 @@
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import type { BadgeStatus } from "../../../src/domain/entities/badge_status";
+import { BadgeStatusCell } from "../../../src/presentation/components/badge_status_cell";
+
+const greenStatus: BadgeStatus = {
+  checks: [
+    { label: "Latest Release", present: true },
+    { label: "License", present: true },
+    { label: "Build Status", present: true },
+    { label: "SonarCloud Coverage", present: true },
+    { label: "SonarCloud Quality Gate", present: true },
+    { label: "OpenSSF Best Practices", present: true },
+  ],
+  color: "green",
+};
+
+const yellowStatus: BadgeStatus = {
+  checks: [
+    { label: "Latest Release", present: true },
+    { label: "License", present: true },
+    { label: "Build Status", present: false },
+    { label: "SonarCloud Coverage", present: false },
+    { label: "SonarCloud Quality Gate", present: false },
+    { label: "OpenSSF Best Practices", present: false },
+  ],
+  color: "yellow",
+};
+
+describe("BadgeStatusCell", () => {
+  it("should render dash when status is null", () => {
+    // given / when
+    render(<BadgeStatusCell status={null} />);
+
+    // then
+    expect(screen.getByText("-")).toBeInTheDocument();
+  });
+
+  it("should render Complete for green status", () => {
+    // given / when
+    render(<BadgeStatusCell status={greenStatus} />);
+
+    // then
+    expect(screen.getByText("Complete")).toBeInTheDocument();
+  });
+
+  it("should render Incomplete for yellow status", () => {
+    // given / when
+    render(<BadgeStatusCell status={yellowStatus} />);
+
+    // then
+    expect(screen.getByText("Incomplete")).toBeInTheDocument();
+  });
+
+  it("should show popup with badge details when clicked", () => {
+    // given
+    render(<BadgeStatusCell status={yellowStatus} />);
+
+    // when
+    fireEvent.click(screen.getByText("Incomplete"));
+
+    // then
+    expect(screen.getByText("Latest Release")).toBeInTheDocument();
+    expect(screen.getByText("License")).toBeInTheDocument();
+    expect(screen.getByText("Build Status")).toBeInTheDocument();
+    expect(screen.getByText("OpenSSF Best Practices")).toBeInTheDocument();
+  });
+
+  it("should close popup when overlay is clicked", () => {
+    // given
+    render(<BadgeStatusCell status={greenStatus} />);
+    fireEvent.click(screen.getByText("Complete"));
+    expect(screen.getByText("Latest Release")).toBeInTheDocument();
+
+    // when
+    const overlay = document.querySelector(".fixed.inset-0") as HTMLElement;
+    fireEvent.click(overlay);
+
+    // then
+    expect(screen.queryByText("Latest Release")).not.toBeInTheDocument();
+  });
+});

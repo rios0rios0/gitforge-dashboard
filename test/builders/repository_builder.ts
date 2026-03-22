@@ -1,3 +1,4 @@
+import type { BadgeStatus } from "../../src/domain/entities/badge_status";
 import type { ComplianceStatus } from "../../src/domain/entities/compliance_status";
 import type { Repository } from "../../src/domain/entities/repository";
 import type { Release } from "../../src/domain/entities/release";
@@ -30,6 +31,7 @@ export class RepositoryBuilder {
       branches: ["main"],
       sonarMetrics: null,
       complianceStatus: null,
+      badgeStatus: null,
     };
   }
 
@@ -108,6 +110,11 @@ export class RepositoryBuilder {
 
   withComplianceStatus(status: ComplianceStatus): this {
     this.props = { ...this.props, complianceStatus: status };
+    return this;
+  }
+
+  withBadgeStatus(status: BadgeStatus): this {
+    this.props = { ...this.props, badgeStatus: status };
     return this;
   }
 

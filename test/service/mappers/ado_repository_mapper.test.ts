@@ -59,6 +59,7 @@ describe("mapAdoRepoToRepository", () => {
     expect(result.primaryLanguage).toBeNull();
     expect(result.branches).toEqual(["main", "develop", "feat/x"]);
     expect(result.complianceStatus).toBeNull();
+    expect(result.badgeStatus).toBeNull();
   });
 
   it("should map build result 'failed' to FAILURE", () => {

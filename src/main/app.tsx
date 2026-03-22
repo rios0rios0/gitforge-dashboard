@@ -9,6 +9,7 @@ import { ContributorsPage } from "../presentation/pages/contributors_page";
 import { LoginPage } from "../presentation/pages/login_page";
 import { SettingsPage } from "../presentation/pages/settings_page";
 import {
+  createBadgeRepository,
   createComplianceRepository,
   createContributorRepository,
   createRepositoryRepository,
@@ -62,11 +63,16 @@ const AppContent = ({ authService }: { authService: AuthenticationService }) => 
     return createComplianceRepository(platform);
   }, [platform]);
 
+  const badgeRepo = useMemo(() => {
+    if (!platform) return null;
+    return createBadgeRepository(platform);
+  }, [platform]);
+
   const dashboardService = useMemo(() => {
-    if (!platform || !complianceRepo) return null;
+    if (!platform || !complianceRepo || !badgeRepo) return null;
     const repoRepo = createRepositoryRepository(platform);
-    return createDashboardService(repoRepo, sonarRepo, complianceRepo);
-  }, [platform, sonarRepo, complianceRepo]);
+    return createDashboardService(repoRepo, sonarRepo, complianceRepo, badgeRepo);
+  }, [platform, sonarRepo, complianceRepo, badgeRepo]);
 
   const contributorService = useMemo(() => {
     if (!platform) return null;

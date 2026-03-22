@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
+import type { BadgeStatus } from "../../src/domain/entities/badge_status";
 import type { ComplianceStatus } from "../../src/domain/entities/compliance_status";
 import { GitHubDashboardService } from "../../src/service/github_dashboard_service";
 import { RepositoryBuilder } from "../builders/repository_builder";
+import { StubBadgeRepository } from "../doubles/stub_badge_repository";
 import { StubComplianceRepository } from "../doubles/stub_compliance_repository";
 import { StubRepositoryRepository } from "../doubles/stub_repository_repository";
 import { StubSonarRepository } from "../doubles/stub_sonar_repository";
@@ -16,7 +18,8 @@ describe("GitHubDashboardService", () => {
     const repository = new StubRepositoryRepository().withRepositories(repos);
     const sonarRepo = new StubSonarRepository();
     const complianceRepo = new StubComplianceRepository();
-    const service = new GitHubDashboardService(repository, sonarRepo, complianceRepo);
+    const badgeRepo = new StubBadgeRepository();
+    const service = new GitHubDashboardService(repository, sonarRepo, complianceRepo, badgeRepo);
 
     // when
     const result = await service.listRepositories("token", "user");
@@ -32,7 +35,8 @@ describe("GitHubDashboardService", () => {
     const repository = new StubRepositoryRepository().withError(new Error("API failure"));
     const sonarRepo = new StubSonarRepository();
     const complianceRepo = new StubComplianceRepository();
-    const service = new GitHubDashboardService(repository, sonarRepo, complianceRepo);
+    const badgeRepo = new StubBadgeRepository();
+    const service = new GitHubDashboardService(repository, sonarRepo, complianceRepo, badgeRepo);
 
     // when / then
     await expect(service.listRepositories("token", "user")).rejects.toThrow("API failure");
@@ -59,7 +63,8 @@ describe("GitHubDashboardService", () => {
       .withProjectKeys(["org_my-app"])
       .withProjectMetrics("org_my-app", sonarMetrics);
     const complianceRepo = new StubComplianceRepository();
-    const service = new GitHubDashboardService(repository, sonarRepo, complianceRepo);
+    const badgeRepo = new StubBadgeRepository();
+    const service = new GitHubDashboardService(repository, sonarRepo, complianceRepo, badgeRepo);
 
     // when
     const result = await service.listRepositories("token", "user");
@@ -76,7 +81,8 @@ describe("GitHubDashboardService", () => {
     const sonarRepo = new StubSonarRepository()
       .withProjectKeys(["completely-unrelated-project"]);
     const complianceRepo = new StubComplianceRepository();
-    const service = new GitHubDashboardService(repository, sonarRepo, complianceRepo);
+    const badgeRepo = new StubBadgeRepository();
+    const service = new GitHubDashboardService(repository, sonarRepo, complianceRepo, badgeRepo);
 
     // when
     const result = await service.listRepositories("token", "user");
@@ -102,7 +108,8 @@ describe("GitHubDashboardService", () => {
     };
     const complianceRepo = new StubComplianceRepository()
       .withComplianceStatus("repo-a", compliance);
-    const service = new GitHubDashboardService(repository, sonarRepo, complianceRepo);
+    const badgeRepo = new StubBadgeRepository();
+    const service = new GitHubDashboardService(repository, sonarRepo, complianceRepo, badgeRepo);
 
     // when
     const result = await service.listRepositories("token", "user");
@@ -110,5 +117,37 @@ describe("GitHubDashboardService", () => {
     // then
     expect(result[0].complianceStatus).toEqual(compliance);
     expect(result[1].complianceStatus).toBeNull();
+  });
+
+  it("should enrich repositories with badge status", async () => {
+    // given
+    const repos = [
+      RepositoryBuilder.create().withName("repo-a").build(),
+      RepositoryBuilder.create().withName("repo-b").build(),
+    ];
+    const repository = new StubRepositoryRepository().withRepositories(repos);
+    const sonarRepo = new StubSonarRepository();
+    const complianceRepo = new StubComplianceRepository();
+    const badgeStatus: BadgeStatus = {
+      checks: [
+        { label: "Latest Release", present: true },
+        { label: "License", present: true },
+        { label: "Build Status", present: true },
+        { label: "SonarCloud Coverage", present: true },
+        { label: "SonarCloud Quality Gate", present: true },
+        { label: "OpenSSF Best Practices", present: true },
+      ],
+      color: "green",
+    };
+    const badgeRepo = new StubBadgeRepository()
+      .withBadgeStatus("repo-a", badgeStatus);
+    const service = new GitHubDashboardService(repository, sonarRepo, complianceRepo, badgeRepo);
+
+    // when
+    const result = await service.listRepositories("token", "user");
+
+    // then
+    expect(result[0].badgeStatus).toEqual(badgeStatus);
+    expect(result[1].badgeStatus).toBeNull();
   });
 });

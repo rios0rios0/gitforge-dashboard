@@ -1,3 +1,4 @@
+import type { BadgeRepository } from "../../domain/repositories/badge_repository";
 import type { ComplianceRepository } from "../../domain/repositories/compliance_repository";
 import type { ContributorRepository } from "../../domain/repositories/contributor_repository";
 import type { RepositoryRepository } from "../../domain/repositories/repository_repository";
@@ -20,7 +21,8 @@ export const createDashboardService = (
   repositoryRepository: RepositoryRepository,
   sonarRepository: SonarRepository,
   complianceRepository: ComplianceRepository,
-): DashboardService => new GitHubDashboardService(repositoryRepository, sonarRepository, complianceRepository);
+  badgeRepository: BadgeRepository,
+): DashboardService => new GitHubDashboardService(repositoryRepository, sonarRepository, complianceRepository, badgeRepository);
 
 export const createContributorService = (
   contributorRepository: ContributorRepository,

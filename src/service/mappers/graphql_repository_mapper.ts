@@ -64,4 +64,5 @@ export const mapGraphQLNodeToRepository = (node: GraphQLRepositoryNode): Reposit
   branches: node.branchRefs.nodes.map((ref) => ref.name),
   sonarMetrics: null,
   complianceStatus: null,
+  badgeStatus: null,
 });

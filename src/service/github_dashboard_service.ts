@@ -1,5 +1,7 @@
+import type { BadgeStatus } from "../domain/entities/badge_status";
 import type { ComplianceStatus } from "../domain/entities/compliance_status";
 import type { Repository } from "../domain/entities/repository";
+import type { BadgeRepository } from "../domain/repositories/badge_repository";
 import type { ComplianceRepository } from "../domain/repositories/compliance_repository";
 import type { RepositoryRepository } from "../domain/repositories/repository_repository";
 import type { SonarRepository } from "../domain/repositories/sonar_repository";
@@ -14,21 +16,25 @@ export class GitHubDashboardService implements DashboardService {
   private readonly repositoryRepository: RepositoryRepository;
   private readonly sonarRepository: SonarRepository;
   private readonly complianceRepository: ComplianceRepository;
+  private readonly badgeRepository: BadgeRepository;
 
   constructor(
     repositoryRepository: RepositoryRepository,
     sonarRepository: SonarRepository,
     complianceRepository: ComplianceRepository,
+    badgeRepository: BadgeRepository,
   ) {
     this.repositoryRepository = repositoryRepository;
     this.sonarRepository = sonarRepository;
     this.complianceRepository = complianceRepository;
+    this.badgeRepository = badgeRepository;
   }
 
   async listRepositories(token: string, username: string): Promise<Repository[]> {
     const repos = await this.repositoryRepository.listAll(token, username);
     const withSonar = await this.enrichWithSonar(repos);
-    return this.enrichWithCompliance(withSonar, token);
+    const withCompliance = await this.enrichWithCompliance(withSonar, token);
+    return this.enrichWithBadges(withCompliance, token);
   }
 
   private async enrichWithSonar(repos: Repository[]): Promise<Repository[]> {
@@ -90,6 +96,34 @@ export class GitHubDashboardService implements DashboardService {
     return repos.map((repo) => ({
       ...repo,
       complianceStatus: complianceMap.get(repo.id) ?? null,
+    }));
+  }
+
+  private async enrichWithBadges(repos: Repository[], token: string): Promise<Repository[]> {
+    const badgeMap = new Map<string, BadgeStatus | null>();
+
+    for (let i = 0; i < repos.length; i += BATCH_SIZE) {
+      const batch = repos.slice(i, i + BATCH_SIZE);
+      const results = await Promise.all(
+        batch.map(async (repo) => {
+          const parts = repo.fullName.split("/");
+          const owner = parts.length >= 3 ? `${parts[0]}/${parts[1]}` : parts[0];
+          const status = await this.badgeRepository.getBadgeStatus(
+            token,
+            owner,
+            repo.name,
+          );
+          return [repo.id, status] as const;
+        }),
+      );
+      for (const [repoId, status] of results) {
+        badgeMap.set(repoId, status);
+      }
+    }
+
+    return repos.map((repo) => ({
+      ...repo,
+      badgeStatus: badgeMap.get(repo.id) ?? null,
     }));
   }
 }

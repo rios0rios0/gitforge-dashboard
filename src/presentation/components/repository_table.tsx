@@ -11,6 +11,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { Repository } from "../../domain/entities/repository";
+import { BadgeStatusCell } from "./badge_status_cell";
 import { ComplianceBadge } from "./compliance_badge";
 import { StatusBadge } from "./status_badge";
 
@@ -159,6 +160,17 @@ const columns: ColumnDef<Repository>[] = [
     filterFn: (row, _columnId, filterValue) => {
       if (!filterValue) return true;
       return (row.original.complianceStatus?.color ?? "none") === filterValue;
+    },
+  },
+  {
+    id: "badges",
+    accessorFn: (row) => row.badgeStatus?.color ?? "none",
+    header: "Badges",
+    cell: ({ row }) => <BadgeStatusCell status={row.original.badgeStatus} />,
+    meta: { filterType: "select", options: ["", "green", "yellow"] },
+    filterFn: (row, _columnId, filterValue) => {
+      if (!filterValue) return true;
+      return (row.original.badgeStatus?.color ?? "none") === filterValue;
     },
   },
   {
