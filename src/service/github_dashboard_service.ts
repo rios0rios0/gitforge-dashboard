@@ -12,6 +12,11 @@ const BATCH_SIZE = 10;
 const matchRepoToProject = (repoName: string, projectKey: string): boolean =>
   projectKey.toLowerCase().includes(repoName.toLowerCase());
 
+const getOwnerFromFullName = (fullName: string): string => {
+  const parts = fullName.split("/");
+  return parts.length >= 3 ? `${parts[0]}/${parts[1]}` : parts[0];
+};
+
 export class GitHubDashboardService implements DashboardService {
   private readonly repositoryRepository: RepositoryRepository;
   private readonly sonarRepository: SonarRepository;
@@ -77,8 +82,7 @@ export class GitHubDashboardService implements DashboardService {
       const batch = repos.slice(i, i + BATCH_SIZE);
       const results = await Promise.all(
         batch.map(async (repo) => {
-          const parts = repo.fullName.split("/");
-          const owner = parts.length >= 3 ? `${parts[0]}/${parts[1]}` : parts[0];
+          const owner = getOwnerFromFullName(repo.fullName);
           const status = await this.complianceRepository.getComplianceStatus(
             token,
             owner,
@@ -106,8 +110,7 @@ export class GitHubDashboardService implements DashboardService {
       const batch = repos.slice(i, i + BATCH_SIZE);
       const results = await Promise.all(
         batch.map(async (repo) => {
-          const parts = repo.fullName.split("/");
-          const owner = parts.length >= 3 ? `${parts[0]}/${parts[1]}` : parts[0];
+          const owner = getOwnerFromFullName(repo.fullName);
           const status = await this.badgeRepository.getBadgeStatus(
             token,
             owner,

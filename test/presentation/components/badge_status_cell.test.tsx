@@ -73,8 +73,7 @@ describe("BadgeStatusCell", () => {
     expect(screen.getByText("Latest Release")).toBeInTheDocument();
 
     // when
-    const overlay = document.querySelector(".fixed.inset-0") as HTMLElement;
-    fireEvent.click(overlay);
+    fireEvent.click(screen.getByTestId("badge-overlay"));
 
     // then
     expect(screen.queryByText("Latest Release")).not.toBeInTheDocument();

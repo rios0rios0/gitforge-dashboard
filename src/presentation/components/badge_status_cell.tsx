@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { BadgeColor, BadgeStatus } from "../../domain/entities/badge_status";
 
 const COLOR_STYLES: Record<BadgeColor, { bg: string; text: string; label: string }> = {
@@ -13,6 +13,16 @@ interface BadgeStatusCellProps {
 export const BadgeStatusCell = ({ status }: BadgeStatusCellProps) => {
   const [open, setOpen] = useState(false);
   const toggle = useCallback(() => setOpen((prev) => !prev), []);
+  const close = useCallback(() => setOpen(false), []);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, close]);
 
   if (!status) return <span className="text-xs text-gray-400 dark:text-gray-500">-</span>;
 
@@ -23,14 +33,20 @@ export const BadgeStatusCell = ({ status }: BadgeStatusCellProps) => {
       <button
         type="button"
         onClick={toggle}
+        aria-expanded={open}
+        aria-haspopup="true"
         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium cursor-pointer ${style.bg} ${style.text}`}
       >
         {style.label}
       </button>
       {open && (
         <>
-          <div className="fixed inset-0 z-10" onClick={toggle} />
-          <div className="absolute left-0 top-full z-20 mt-1 w-64 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">
+          <div data-testid="badge-overlay" className="fixed inset-0 z-10" onClick={close} />
+          <div
+            role="menu"
+            aria-label="Badge details"
+            className="absolute left-0 top-full z-20 mt-1 w-64 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
+          >
             <ul className="py-1">
               {status.checks.map((check) => (
                 <li
