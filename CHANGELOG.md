@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- changed CI workflow to use the new `yarn.yaml` reusable workflow from `rios0rios0/pipelines` (replacing deprecated `javascript.yaml`)
 - changed CI workflow to follow the standard `default.yaml` pattern with named workflow, permission comments, and `default` job name
 - changed coverage thresholds from 80/80/75/80 to 90/90/77/90 (lines/functions/branches/statements) in `vite.config.ts`
 - changed DI wiring to create repositories and services dynamically based on selected platform
