@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A client-side-only TypeScript + React dashboard deployed on GitHub Pages. It displays CI workflow status, releases, and tags across all of a GitHub user's repositories using the GitHub GraphQL API. No backend server — runs entirely in the browser.
+A client-side-only TypeScript + React dashboard deployed on GitHub Pages. It displays CI workflow status, releases, tags, compliance checks, and contributor metrics across repositories from GitHub (GraphQL API) and Azure DevOps (REST API). Integrates with SonarCloud and WakaTime for additional metrics. No backend server — runs entirely in the browser.
 
 ## Commands
 
@@ -26,10 +26,10 @@ make sast              # Run full SAST suite (CodeQL, Semgrep, Trivy, Hadolint, 
 
 ```
 src/domain/           → Entities, contracts (ports), pure filter/sort functions
-src/service/          → Business logic, GraphQL-to-entity mappers
-src/infrastructure/   → GitHub GraphQL API client, localStorage auth
-src/presentation/     → React components, hooks, pages
-src/main/             → DI wiring via factories, app entry point
+src/service/          → Business logic, platform-specific mappers (GitHub GraphQL + ADO REST)
+src/infrastructure/   → GitHub GraphQL & ADO REST clients, Web Crypto AES-GCM encrypted auth
+src/presentation/     → React components, hooks, pages (dashboard, contributors, settings)
+src/main/             → DI wiring via factories, platform-aware app entry point
 ```
 
 ### Key Files
@@ -38,9 +38,12 @@ src/main/             → DI wiring via factories, app entry point
 |------|---------|
 | `src/domain/entities/dashboard_filter.ts` | Filter/sort logic (pure functions, no side effects) |
 | `src/domain/entities/compliance_status.ts` | Compliance check entity and color computation logic |
+| `src/domain/entities/platform.ts` | Platform abstraction (GitHub / Azure DevOps) |
 | `src/infrastructure/repositories/github_compliance_repository.ts` | GitHub compliance checks via GraphQL (workflow file + branch protection) |
 | `src/infrastructure/repositories/ado_compliance_repository.ts` | ADO compliance checks via REST (build definitions + policy configurations) |
 | `src/infrastructure/repositories/github_graphql_repository_repository.ts` | Core GraphQL query that bulk-fetches repos + CI + releases + tags |
+| `src/infrastructure/http/ado_rest_client.ts` | Azure DevOps REST API client |
+| `src/infrastructure/services/encrypted_authentication_service.ts` | Web Crypto AES-GCM encrypted token storage |
 | `src/service/mappers/graphql_repository_mapper.ts` | Maps raw GraphQL response to domain entities |
 | `src/presentation/hooks/use_repositories.ts` | Central data fetching hook with loading/error states |
 | `src/main/app.tsx` | Root component with auth check and DI wiring |
