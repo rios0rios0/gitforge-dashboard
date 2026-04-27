@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- refreshed `CLAUDE.md` to document Azure DevOps support, encrypted auth, and new key files
+- refreshed `.github/copilot-instructions.md` to fix `npm` → `yarn` commands, replace outdated file tree with high-level architecture, and update platform/integration descriptions
+
 ## [0.2.0] - 2026-03-22
 
 ### Added
