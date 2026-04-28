@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   default:
-    uses: 'rios0rios0/pipelines/.github/workflows/yarn.yaml@main'
+    uses: 'rios0rios0/pipelines/.github/workflows/yarn-library.yaml@main'
     secrets:
       sonar_token: ${{ secrets.SONAR_TOKEN }}
 
