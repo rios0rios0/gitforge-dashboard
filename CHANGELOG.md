@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- refreshed `CLAUDE.md` to fix pipeline reference from `yarn.yaml` to `yarn-library.yaml` in Deployment section
+
 ## [0.2.1] - 2026-04-28
 
 ### Changed

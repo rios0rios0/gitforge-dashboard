@@ -70,4 +70,4 @@ yarn test:watch        # Watch mode for TDD
 
 ## Deployment
 
-Deployed to GitHub Pages via `.github/workflows/default.yaml`. CI runs `rios0rios0/pipelines/.github/workflows/yarn.yaml`, then builds and deploys to Pages on push to `main`.
+Deployed to GitHub Pages via `.github/workflows/default.yaml`. CI runs `rios0rios0/pipelines/.github/workflows/yarn-library.yaml`, then builds and deploys to Pages on push to `main`.
