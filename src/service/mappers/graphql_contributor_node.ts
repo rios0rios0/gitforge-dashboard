@@ -29,18 +29,3 @@ export interface GraphQLPullRequestNode {
     }[];
   };
 }
-
-export interface GraphQLContributorQueryResponse {
-  user: {
-    repositories: {
-      pageInfo: { hasNextPage: boolean; endCursor: string | null };
-      nodes: {
-        name: string;
-        pullRequests: {
-          pageInfo: { hasNextPage: boolean; endCursor: string | null };
-          nodes: GraphQLPullRequestNode[];
-        };
-      }[];
-    };
-  };
-}

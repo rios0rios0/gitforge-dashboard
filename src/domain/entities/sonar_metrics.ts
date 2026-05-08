@@ -10,14 +10,3 @@ export interface SonarMetrics {
   readonly technicalDebt: string;
   readonly qualityGateStatus: QualityGateStatus;
 }
-
-export const EMPTY_SONAR_METRICS: SonarMetrics = {
-  bugs: 0,
-  codeSmells: 0,
-  securityHotspots: 0,
-  vulnerabilities: 0,
-  coverage: 0,
-  duplications: 0,
-  technicalDebt: "0min",
-  qualityGateStatus: "NONE",
-};
