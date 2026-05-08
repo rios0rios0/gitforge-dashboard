@@ -7,9 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-05-08
+
+### Added
+
+- added `knip.json` with `ignoreExportsUsedInFile: true` so types exported only for same-file consumption (e.g. `CIFilter`, `ReleaseFilter`, `GraphQLResponse`, `AdoPullRequestIdentity`, `AdoPullRequestReviewer`) are not falsely reported as unused
+
 ### Changed
 
 - refreshed `CLAUDE.md` to fix pipeline reference from `yarn.yaml` to `yarn-library.yaml` in Deployment section
+
+### Removed
+
+- removed unused `EMPTY_SONAR_METRICS` constant from `src/domain/entities/sonar_metrics.ts` (flagged by `quality:knip`)
+- removed unused `GraphQLContributorQueryResponse` interface from `src/service/mappers/graphql_contributor_node.ts` (flagged by `quality:knip`)
 
 ## [0.2.1] - 2026-04-28
 
